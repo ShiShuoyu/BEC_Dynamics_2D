@@ -1,9 +1,9 @@
 import numpy as np
 import cupy as cp
 
-from constants import hbar, m, e0
+from constants import hbar, m, e0, t0
 
-def grid(x_range:list, y_range:list, Nx:int, Ny:int
+def grid(x_range:np.ndarray, y_range:np.ndarray, Nx:np.int32, Ny:np.int32
                  ) -> tuple[cp.ndarray, cp.ndarray, cp.ndarray, cp.ndarray, np.float32, np.float32]:
     '''
     functionality: 
@@ -62,8 +62,8 @@ def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray,
         np.exp(-1j * loss * dt * 
         (Kx**2 + Ky**2) / 2
             ), dtype=cp.complex64
-                )
-    return (V_sqrt, T)
+                ) # Here K.E. = p^2/2m / e0 = (hbar^2/2m)*k^2 / e0 = (1/2) * x0^2 * k^2 -> dimensionless
+    return (U, V_sqrt, T)
 
 def Norm(psi:cp.ndarray, dx:np.float32, dy:np.float32) -> np.float32:
     '''
@@ -103,7 +103,7 @@ def wf_Gaussian(X:cp.ndarray, Y:cp.ndarray, BEC_center:np.ndarray, omega:np.floa
 def wf_ThomasFermi():
     ...
 
-def boost(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, kx:np.float32, ky:np.float32
+def boost(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, vx:np.float32, vy:np.float32
           ) -> cp.ndarray:
     '''
     functionality:
@@ -112,9 +112,9 @@ def boost(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, kx:np.float32, ky:np.float
         psi: wavefunction, shape (Ny, Nx)
         X: x coordinates meshgrid, shape (Ny, Nx) # μm
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
-        (kx, ky): the wavevector of the plane wave # μm^-1
+        (vx, vy): the initial velocity of the wavepacket # μm/ms
     output:
         psi: boosted wavefunction, shape (Ny, Nx)
     '''
-    return ...
-    # return psi * cp.exp(1j * (kx*X + ky*Y))
+    # psi = psi e^{i\frac{m\vec{v}}{\hbar}\cdot\vec{x}}
+    return psi * cp.exp(1j * (vx*X + vy*Y) * t0)
