@@ -80,7 +80,7 @@ def main():
             if args.video:
                 # Store the wavefunction for visualization
                 ...
-            # Store the mechanical values
+            # Store the mechanical quantities
             ...
 
 if __name__ == "__main__":

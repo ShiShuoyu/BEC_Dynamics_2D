@@ -55,7 +55,7 @@ def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray,
     '''
     loss = 1 - 0.4j if imaginary_time else 1
 
-    U = cp.asarray(0.5 * m * omega**2 * (((1-2*beta) * ((X-trap_center[0])**2+(Y-trap_center[1])**2)) + (beta/r_0) * ((X-trap_center[0])**2+(Y-trap_center[1])**2)**2) / e0, dtype=cp.complex64)
+    U = cp.asarray(0.5 * m * omega**2 * (((1-2*beta) * ((X-trap_center[0])**2+(Y-trap_center[1])**2)) + (beta/r_0**2) * ((X-trap_center[0])**2+(Y-trap_center[1])**2)**2) / e0, dtype=cp.complex64)
     V_sqrt = cp.exp(-1j * loss * (dt/2) * U)
 
     T = cp.asarray(
