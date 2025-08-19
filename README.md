@@ -4,9 +4,11 @@ Simulating and visualizing the mechanical motion of 2D Bose-Einstein condensates
 
 ## Physical Settings
 **quadratic dispersion relation** + **tunable anharmonic trap** + **mean-field interacting term**
+![Hamiltonian](readme_fig/Hamiltonian.png)
 
 ## Numerical Method
 Solving the time dependent Gross-Pitaevskii equation by split-step method using FFT.
+![evolve](readme_fig/evolve.png)
 
 ## Why 2D?
 - 2D simulation is much more faster than its 3D counterpart, and much more interesting than 1D case.
