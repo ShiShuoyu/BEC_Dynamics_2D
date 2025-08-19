@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cupy as cp
 import tkinter as tk
+import json
 from argparse import ArgumentParser
 
-from constants import *
 import arguments as agms
 import wf
 import evolve as ev
@@ -18,12 +18,24 @@ def main():
     # display the simulation parameters
     agms.display_args(args)    
 
+    # Update the constants.json file with the new atomic parameters
+    with open("constants.json", "r") as f:
+        constants = json.load(f)
+    constants["Ar"] = args.relative_atomic_mass
+    constants["a"] = args.scattering_length
+    with open("constants.json", "w") as f:
+        json.dump(constants, f, indent=4)
+
+    # Calculate the atomic interaction strength
+    g = 0
+
     # Generate the grid, operators, and initial wavefunction
     (X, Y, Kx, Ky, dx, dy) = wf.grid(x_range=(-args.radius_xy[0], args.radius_xy[0]),
                                       y_range=(-args.radius_xy[1], args.radius_xy[1]),
                                         Nx=args.number_xy[0], Ny=args.number_xy[1])
-    (U, V_sqrt, T) = wf.operator(X=X, Y=Y, Kx=Kx, Ky=Ky, m=m, omega=args.omega_trap,
-                                 trap_center=np.array(args.center_trap), beta=args.beta)
+    (U, V_sqrt, T) = wf.operator(X=X, Y=Y, Kx=Kx, Ky=Ky, omega=args.omega_trap,
+                                 trap_center=np.array(args.center_trap), beta=args.beta, 
+                                 r_0=args.r_0, imaginary_time=args.imaginary_time, dt=args.dt)
     psi = wf.wf_Gaussian(X=X, Y=Y, BEC_center=np.array(args.center_bec), omega=args.omega_bec, dx=dx, dy=dy)
     psi = wf.boost(psi=psi, X=X, Y=Y, vx=args.velocity[0], vy=args.velocity[1])
 
@@ -37,7 +49,7 @@ def main():
     # Time evolution loop
     for step in range(n_steps):
         # Evolve the wavefunction
-        psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, g=0)
+        psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, g=g)
         time = time + dt
 
         # Sample the wavefunction

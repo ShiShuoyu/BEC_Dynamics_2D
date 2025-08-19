@@ -31,7 +31,7 @@ def grid(x_range:np.ndarray, y_range:np.ndarray, Nx:np.int32, Ny:np.int32
     return (X, Y, Kx, Ky, dx, dy)
 
 def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
-             m:np.float32, omega:np.float32, trap_center:np.ndarray, beta:np.float32, 
+             omega:np.float32, trap_center:np.ndarray, beta:np.float32, 
              r_0:np.float32, imaginary_time:np.bool, dt:np.float32) -> tuple[cp.ndarray, cp.ndarray]:
     '''
     functionality: 
@@ -41,7 +41,6 @@ def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray,
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         Kx: kx coordinates meshgrid, shape (Ny, Nx) # μm^-1
         Ky: ky coordinates meshgrid, shape (Ny, Nx) # μm^-1
-        m: mass of the particle # kg
         omega: trap frequency # ms^-1
         trap_center: center of the trap, shape (2,) # μm
         beta: anisotropy parameter # dimensionless

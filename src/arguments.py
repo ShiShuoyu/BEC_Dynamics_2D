@@ -12,6 +12,10 @@ def input_args() -> ArgumentParser:
     parser = ArgumentParser(
         description="Simulating and visualizing the machanical motion of 2D Bose-Einstein condensates (BECs)"
         )
+    parser.add_argument('--relative_atomic_mass', type=np.int32, default=87, 
+                        help='Atomic mass of the particle in amu (e.g. ''87'' means Rb-87)')
+    parser.add_argument('--scattering_length', type=np.float32, default=100,
+                        help='Scattering length in Bohr radius (e.g. ''100'' means 100 a_Bohr)')
     parser.add_argument('--duration', type=np.float32, default=200, 
                         help='Totle duration of simulation in ms')
     parser.add_argument('--dt', type=np.float32, default=0.2, 
@@ -28,6 +32,8 @@ def input_args() -> ArgumentParser:
                         help='Center of the trap in μm (e.g. ''(0, 0)'' means the center is at (0, 0) μm)')
     parser.add_argument('--beta', type=np.float32, default=-0.1, 
                         help='Anharmonic parameter (dimensionless) (V = 0.5*m*omega^2*((1-2*beta)*(x^2+y^2) + (beta/r_0)*(x^2+y^2)^2)), where r_0 is the length scale to keep beta dimensionless)')
+    parser.add_argument('--r_0', type=np.float32, default=30, 
+                        help='Length scale to keep beta dimensionless (e.g. ''1'' means the length scale is 1 μm)')
     parser.add_argument('--center_bec', type=np.float32, nargs=2, default=(30, 0), 
                         help='Center of the BEC in μm (e.g. ''25, 25'' means the center is at (25, 25) μm, and r_0 will be set to sqrt(2)*25 μm)')
     parser.add_argument('--omega_bec', type=np.float32, default=0.01*np.pi, 
@@ -47,6 +53,9 @@ def display_args(parser:ArgumentParser) -> None:
     '''
     args = parser.parse_args()
     print("parameters:")
+    print("\n## Atomic parameters ##")
+    print(f"relative atomic mass: {args.relative_atomic_mass} amu")
+    print(f"scattering length: {args.scattering_length} a_Bohr")
     print("\n## time structure ##")
     print(f"duration: {args.duration} ms")
     print(f"time step: {args.dt} ms")
@@ -58,6 +67,7 @@ def display_args(parser:ArgumentParser) -> None:
     print(f"trapping frequency ω: {args.omega} ms^-1")
     print(f"center of the trap: ({args.center_trap[0]}, {args.center_trap[1]}) μm")
     print(f"anharmonic parameter β: {args.beta}")
+    print(f"length scale r_0: {args.r_0} μm")
     print("\n## initial wavepacket ##")
     print(f"center of the BEC: ({args.center_bec[0]}, {args.center_bec[1]}) μm")
     print(f"initial velocity: ({args.velocity[0]}, {args.velocity[1]}) μm/ms")

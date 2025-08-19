@@ -1,7 +1,7 @@
 import numpy as np
 import cupy as cp
 
-from constants import t0
+from constants import hbar, m, e0, t0
 
 def time_step(dt:np.float32, duration:np.float32, sampling_interval:np.int32
               ) -> tuple[np.float32, np.float32, np.int32, np.int32]:
