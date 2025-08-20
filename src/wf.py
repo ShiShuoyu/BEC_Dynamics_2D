@@ -55,6 +55,16 @@ def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray,
     loss = 1 - 0.4j if imaginary_time else 1
 
     U = cp.asarray(0.5 * m * omega**2 * (((1-2*beta) * ((X-trap_center[0])**2+(Y-trap_center[1])**2)) + (beta/r_0**2) * ((X-trap_center[0])**2+(Y-trap_center[1])**2)**2) / e0, dtype=cp.complex64)
+
+    # pesudo potential to avoid the wavepacket to escape the trap during imaginary time evolution
+    # in the region out of the trap, we set the minimal potential to 0.2 * U_max
+    R_squared = (X - trap_center[0])**2 + (Y - trap_center[1])**2
+    U_max = cp.max(cp.abs(U))
+    max_index = cp.argmax(cp.abs(U))
+    r2_threshold = R_squared.flatten()[max_index]
+    condition = (R_squared > r2_threshold) & (cp.abs(U) < 0.2 * U_max)
+    U = cp.where(condition, 0.2 * U_max, U)
+
     V_sqrt = cp.exp(-1j * loss * (dt/2) * U)
 
     T = cp.asarray(
