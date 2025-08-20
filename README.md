@@ -1,17 +1,19 @@
 # BEC_Dynamics_2D
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ShiShuoyu/BEC_Dynamics_2D?tab=MIT-1-ov-file)
+
 Simulating and visualizing the mechanical motion of 2D Bose-Einstein condensates (BECs)  
 *(This repository is under construction...)*
 
 ## Physical Settings
 **quadratic dispersion relation** + **tunable anharmonic trap** + **mean-field interacting term**
 <div align=center>
-<img src="./readme_fig/Hamiltonian.png" width="900"/>
+<img src="./readme_fig/Hamiltonian.png" width="500"/>
 </div>
 
 ## Numerical Method
 Solving the time dependent Gross-Pitaevskii equation by split-step method using FFT.
 <div align=center>
-<img src="./readme_fig/evolve.png" width="900"/>
+<img src="./readme_fig/evolve.png" width="500"/>
 </div>
 
 ## Why 2D?
