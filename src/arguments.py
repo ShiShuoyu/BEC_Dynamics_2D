@@ -8,14 +8,15 @@ def input_args() -> ArgumentParser:
     output:
         parser: ArgumentParser object
     '''
-# Parse command line arguments
     parser = ArgumentParser(
         description="Simulating and visualizing the machanical motion of 2D Bose-Einstein condensates (BECs)"
         )
     parser.add_argument('--relative_atomic_mass', type=np.int32, default=87, 
                         help='Atomic mass of the particle in amu (e.g. ''87'' means Rb-87)')
-    parser.add_argument('--scattering_length', type=np.float32, default=100,
-                        help='Scattering length in Bohr radius (e.g. ''100'' means 100 a_Bohr)')
+    parser.add_argument('--scattering_length', type=np.float32, default=50,
+                        help='Scattering length in Bohr radius (e.g. ''50'' means a_s = 50 a_Bohr)')
+    parser.add_argument('--atom_number', type=np.int32, default=2500, 
+                        help='Number of atoms')
     parser.add_argument('--duration', type=np.float32, default=200, 
                         help='Totle duration of simulation in ms')
     parser.add_argument('--dt', type=np.float32, default=0.2, 
@@ -32,6 +33,8 @@ def input_args() -> ArgumentParser:
                         help='Center of the trap in μm (e.g. ''(0, 0)'' means the center is at (0, 0) μm)')
     parser.add_argument('--beta', type=np.float32, default=-0.1, 
                         help='Anharmonic parameter (dimensionless) (V = 0.5*m*omega^2*((1-2*beta)*(x^2+y^2) + (beta/r_0)*(x^2+y^2)^2)), where r_0 is the length scale to keep beta dimensionless)')
+    parser.add_argument('--omega_trap_z', type=np.float32, default=0.005*np.pi, 
+                        help='Trapping frequency along z in ms^-1')
     parser.add_argument('--r_0', type=np.float32, default=30, 
                         help='Length scale to keep beta dimensionless (e.g. ''1'' means the length scale is 1 μm)')
     parser.add_argument('--center_bec', type=np.float32, nargs=2, default=(30, 0), 
@@ -56,22 +59,26 @@ def display_args(parser:ArgumentParser) -> None:
     print("\n## Atomic parameters ##")
     print(f"relative atomic mass: {args.relative_atomic_mass} amu")
     print(f"scattering length: {args.scattering_length} a_Bohr")
+    print(f"number of atoms: {args.atom_number}")
     print("\n## time structure ##")
     print(f"duration: {args.duration} ms")
     print(f"time step: {args.dt} ms")
     print(f"sampling interval: {args.sampling_interval}")
     print("\n## grid structure ##")
     print(f"radius in x: {args.radius_xy[0]} μm, radius in y: {args.radius_xy[1]} μm")
-    print(f"number in x: {args.output[0]}, number in y: {args.output[1]}")
+    print(f"number in x: {args.number_xy[0]}, number in y: {args.number_xy[1]}")
     print("\n## potential trap ##")
-    print(f"trapping frequency ω: {args.omega} ms^-1")
+    print(f"trapping frequency ω: {args.omega_trap} ms^-1")
     print(f"center of the trap: ({args.center_trap[0]}, {args.center_trap[1]}) μm")
     print(f"anharmonic parameter β: {args.beta}")
     print(f"length scale r_0: {args.r_0} μm")
+    print(f"trapping frequency along z direction ω_z: {args.omega_trap_z} ms^-1")
     print("\n## initial wavepacket ##")
     print(f"center of the BEC: ({args.center_bec[0]}, {args.center_bec[1]}) μm")
+    print(f"trapping frequency of BEC ω_BEC: {args.omega_bec} ms^-1")
     print(f"initial velocity: ({args.velocity[0]}, {args.velocity[1]}) μm/ms")
     print("\n## overall simulation settings ##")
     print(f"imaginary time evolution: {'on' if args.imaginary_time else 'off'}")
+    print(f"video record: {'on' if args.video else 'off'}")
     return
     ...

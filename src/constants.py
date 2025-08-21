@@ -4,6 +4,7 @@ import json
 with open('constants.json', 'w') as f:
     const = json.load(f)
 
+# physical constants #
 hbar = const["hbar"] # reduced Planc constant # J*s = Kg*μm^2*ms^-1
 m0 = const["m0"] # 1a.u. # Kg
 ab = const["ab"] # Bohr radius # μm

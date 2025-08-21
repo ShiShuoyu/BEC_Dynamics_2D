@@ -1,19 +1,45 @@
 # BEC_Dynamics_2D
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ShiShuoyu/BEC_Dynamics_2D?tab=MIT-1-ov-file)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ShiShuoyu/BEC_Dynamics_2D/blob/main/LICENSE)
 
 Simulating and visualizing the mechanical motion of 2D Bose-Einstein condensates (BECs)  
 *(This repository is under construction...)*
 
-## Physical Settings
-**quadratic dispersion relation** + **tunable anharmonic trap** + **mean-field interacting term**
-<div align=center>
-<img src="./readme_fig/Hamiltonian.png" width="500"/>
-</div>
+## 3D -> 2D
+Here we assume that **the degree of freedom in *z* direction is locked in the ground state** of a 1D harmonic trap, and we only consider *xy* plane.
 
 ## Numerical Method
-Solving the time dependent Gross-Pitaevskii equation by split-step method using FFT.
+Put the wavefunction in a 2D grid and solving the time dependent Gross-Pitaevskii equation by split-step method using FFT.
 <div align=center>
-<img src="./readme_fig/evolve.png" width="500"/>
+<img src="./readme_fig/time_evolve.png" width="700"/>
+</div>
+
+## Hamiltonian
+**quadratic dispersion relation** + **tunable anharmonic trap** + **mean-field interacting term**
+<div align=center>
+<img src="./readme_fig/Hamiltonian.png" width="700"/>
+</div>
+
+Here **r** = (x,y), not (x,y,z)
+
+## Interacting strength *g*
+The *physical-makesense* wavefunction is
+<div align=center>
+<img src="./readme_fig/physical_makesense_wf.png" width="700"/>
+</div>
+
+However, we neglect the degree of freedom in *z* direction, and **the grid in computer is 2D**, so it actually represents a *physical-nonsense* wavefunction
+<div align=center>
+<img src="./readme_fig/physical_nonsense_wf.png" width="700"/>
+</div>
+
+It is equal to squeezing the wavepacket into a pancake, and the interacting term in GP equation will explode. To fix things up, we have to renormalize the interacting strength *g*. The energy functional is
+<div align=center>
+<img src="./readme_fig/energy_functional.png" width="700"/>
+</div>
+
+Let the interacting term in the energy functional be the same for both *makesense* and *nonsense* wavefunction, and the renormalized *g'* is obtained
+<div align=center>
+<img src="./readme_fig/correction.png" width="700"/>
 </div>
 
 ## Why 2D?
@@ -21,6 +47,6 @@ Solving the time dependent Gross-Pitaevskii equation by split-step method using 
 - Our eyes can only handle 2D images.
 
 ## Highlights
-- Simulation with units, which is more friendly to beginners.
+- Simulation with units, which is more friendly to beginners and students.
 - Sampling the mechanical quantity (e.g. the angular momentum of the wavepacket) during time evolution.
 - GPU acceleration via CUPY.

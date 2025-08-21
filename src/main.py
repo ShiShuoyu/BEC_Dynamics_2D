@@ -26,9 +26,6 @@ def main():
     with open("constants.json", "w") as f:
         json.dump(constants, f, indent=4)
 
-    # Calculate the atomic interaction strength
-    g = 0
-
     # Generate the grid, operators, and initial wavefunction
     (X, Y, Kx, Ky, dx, dy) = wf.grid(x_range=(-args.radius_xy[0], args.radius_xy[0]),
                                       y_range=(-args.radius_xy[1], args.radius_xy[1]),
@@ -49,7 +46,7 @@ def main():
     # Time evolution loop
     for step in range(n_steps):
         # Evolve the wavefunction
-        psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, g=g)
+        psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z)
         time = time + dt
 
         # Sample the wavefunction
