@@ -4,16 +4,23 @@
 Simulating and visualizing the mechanical motion of 2D Bose-Einstein condensates (BECs)  
 *(This repository is under construction...)*
 
-## 3D → 2D
+## Highlights
+- Simulation with units, which is more friendly to beginners and students.
+- Sampling the mechanical quantity (e.g. the angular momentum of the wavepacket) during time evolution.
+- GPU acceleration via CUPY.
+
+## Physical Settings
+
+### 3D → 2D
 Here we assume that **the degree of freedom in *z* direction is locked in the ground state** of a 1D harmonic trap, and we only consider *xy* plane.
 
-## Numerical Method
+### Numerical Method
 Put the wavefunction in a 2D grid and solving the time dependent Gross-Pitaevskii equation by split-step method using FFT.
 <div align=center>
 <img src="./readme_fig/time_evolve.png" width="700"/>
 </div>
 
-## Hamiltonian
+### Hamiltonian
 **quadratic dispersion relation** + **tunable anharmonic trap** + **mean-field interacting term**
 <div align=center>
 <img src="./readme_fig/Hamiltonian.png" width="700"/>
@@ -21,7 +28,7 @@ Put the wavefunction in a 2D grid and solving the time dependent Gross-Pitaevski
 
 Here **r** = (x,y), not (x,y,z)
 
-## Interacting strength *g*
+### Interacting strength *g*
 The *physical-makesense* wavefunction is
 <div align=center>
 <img src="./readme_fig/physical_makesense_wf.png" width="700"/>
@@ -42,11 +49,19 @@ Let the interacting term in the energy functional be the same for both *makesens
 <img src="./readme_fig/correction.png" width="700"/>
 </div>
 
-## Why 2D?
+### Why 2D?
 - 2D simulation is much more faster than its 3D counterpart, and much more interesting than 1D case.
 - Our eyes can only handle 2D images.
 
-## Highlights
-- Simulation with units, which is more friendly to beginners and students.
-- Sampling the mechanical quantity (e.g. the angular momentum of the wavepacket) during time evolution.
-- GPU acceleration via CUPY.
+## Getting Started
+1. create an conda environment
+```Terminal
+cd BEC_Dynamic_2D
+conda env create -f environment.yml
+conda activate env_bec
+```
+2. try examples
+```Terminal
+cd src
+python main.py --video
+```
