@@ -44,7 +44,7 @@ def input_args() -> ArgumentParser:
                         help='The frequency of the harmonic trap whose ground state is this gaussian wavepacket')
     parser.add_argument('--imaginary_time', action='store_true', 
                         help='If set, perform imaginary time evolution')
-    parser.add_argument('--velocity', type=cp.float32, nargs=2, default=(0, 1),
+    parser.add_argument('--velocity', type=cp.float32, nargs=2, default=(0, 0.8),
                         help='Velocity of the initial wavepacket in μm/ms (e.g. ''(0, 0)'' means no initial velocity)')
     parser.add_argument('--video', action='store_true', 
                         help='If set, save the simulation results as a video')
@@ -79,6 +79,6 @@ def display_args(parser:ArgumentParser) -> None:
     print(f"initial velocity: ({parser.velocity[0]}, {parser.velocity[1]}) μm/ms")
     print("\n## overall simulation settings ##")
     print(f"imaginary time evolution: {'on' if parser.imaginary_time else 'off'}")
-    print(f"video record: {'on' if parser.video else 'off'}")
+    print(f"video record: {'on' if parser.video else 'off'}\n")
     return
     ...

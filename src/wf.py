@@ -28,7 +28,7 @@ def grid(x_range:cp.ndarray, y_range:cp.ndarray, Nx:cp.int32, Ny:cp.int32
     [Kx, Ky] = cp.meshgrid(kx, ky)
     X, Y = cp.asarray(X, dtype=cp.float32), cp.asarray(Y, dtype=cp.float32)
     Kx, Ky = cp.asarray(Kx, dtype=cp.float32), cp.asarray(Ky, dtype=cp.float32)
-    return (X, Y, Kx, Ky, dx, dy)
+    return (X, -Y, Kx, Ky, dx, dy)
 
 def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
              omega:cp.float32, trap_center:cp.ndarray, beta:cp.float32, 
@@ -125,5 +125,4 @@ def boost(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, vx:cp.float32, vy:cp.float
     output:
         psi: boosted wavefunction, shape (Ny, Nx)
     '''
-    # psi = psi e^{i\frac{m\vec{v}}{\hbar}\cdot\vec{x}}
-    return psi * cp.exp(1j * (vx*X + vy*Y) * t0)
+    return psi * cp.exp(1j * (vx*X + vy*Y)) # need to be fixed
