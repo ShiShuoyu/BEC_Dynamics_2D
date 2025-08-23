@@ -19,7 +19,7 @@ def input_args() -> ArgumentParser:
                         help='Number of atoms')
     parser.add_argument('--duration', type=np.float32, default=200, 
                         help='Totle duration of simulation in ms')
-    parser.add_argument('--dt', type=np.float32, default=0.2, 
+    parser.add_argument('--dt', type=np.float32, default=1, 
                         help='Time step in ms')
     parser.add_argument('--sampling_interval', type=np.int32, default=20, 
                         help='After how many time steps to sample the wave function')

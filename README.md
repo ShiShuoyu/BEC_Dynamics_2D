@@ -4,7 +4,7 @@
 Simulating and visualizing the mechanical motion of 2D Bose-Einstein condensates (BECs)  
 *(This repository is under construction...)*
 
-## 3D -> 2D
+## 3D → 2D
 Here we assume that **the degree of freedom in *z* direction is locked in the ground state** of a 1D harmonic trap, and we only consider *xy* plane.
 
 ## Numerical Method
@@ -32,7 +32,7 @@ However, we neglect the degree of freedom in *z* direction, and **the grid in co
 <img src="./readme_fig/physical_nonsense_wf.png" width="700"/>
 </div>
 
-It is equal to squeezing the wavepacket into a pancake, and the interacting term in GP equation will explode. To fix things up, we have to renormalize the interacting strength *g*. The energy functional is
+Where *x_0* is the demensionless unit in the simulation that is set to 1 μm. It is equal to squeezing the wavepacket into a pancake, and the interacting term in GP equation will explode. To fix things up, we have to renormalize the interacting strength *g*. The energy functional is
 <div align=center>
 <img src="./readme_fig/energy_functional.png" width="700"/>
 </div>

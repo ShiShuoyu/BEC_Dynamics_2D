@@ -21,7 +21,7 @@ def time_step(dt:np.float32, duration:np.float32, sampling_interval:np.int32
     return (dt / t0, duration / t0, int(np.round(duration / dt)), int(np.round(duration / dt / sampling_interval)))
 
 def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray, 
-                   dt:np.float32, Num:np.int32, omega_z:np.float32) -> np.ndarray:
+                   dt:np.float32, Num:np.int32, omega_z:np.float32, imaginary_time:np.bool) -> np.ndarray:
     '''
     functionality:
         evolve the wave function psi under the potential V, kinetic operator T, and interaction erengy g|ψ|^2
@@ -33,9 +33,11 @@ def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray
         dt: time step # ms
         Num: number of atoms
         omega_z: trapping frequency along z direction
+        imaginary_time: if True, perform imaginary time evolution
     output:
         psi: evolved wave function, shape (Nx, Ny)
     '''
+    loss = 1 - 0.4j if imaginary_time else 1
     # interacting strength #
     g = (4*np.pi*Num * hbar**2 * a*ab / m / e0 / x0**3
          ) * np.sqrt(m*omega_z/2/np.pi/hbar * x0
@@ -46,7 +48,7 @@ def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray
         psi = cp.ifft2(cp.fft2(psi) * T)
         psi = psi * V_sqrt
     else:
-        V_sqrt_g = cp.exp(-1j * (dt/2) * (U + g*cp.abs(psi)**2))
+        V_sqrt_g = cp.exp(-1j * (dt/2) * (U + g*cp.abs(psi)**2) * loss)
         psi = psi * V_sqrt_g
         psi = cp.ifft2(cp.fft2(psi) * T)
         psi = psi * V_sqrt_g

@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import animation
 import cupy as cp
 import tkinter as tk
 import json
@@ -42,20 +43,30 @@ def main():
     # Prepare the output arrays
     time = 0
     ...
+    # Prepare the output video
+    if args.video:
+        FFMpegWriter = animation.writers['ffmpeg']
+        metadata = dict(title='BEC_Dynamics_2D', artist='matplotlib',
+                        comment="Split step method")
+        writer = FFMpegWriter(fps=30, metadata=metadata)
 
-    # Time evolution loop
-    for step in range(n_steps):
-        # Evolve the wavefunction
-        psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z)
-        time = time + dt
+    fig, ax = plt.subplots()
 
-        # Sample the wavefunction
-        if step % (args.sampling_interval) == 0:
-            if args.video:
-                # Store the wavefunction for visualization
-                ...
-            # Store the mechanical quantities
-            ...
+    with writer.saving(fig, 'BEC_2D.mp4', 100):
+        # Time evolution loop
+        for step in range(n_steps):
+            # Evolve the wavefunction
+            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z)
+            time = time + dt
+
+            # Sample the wavefunction
+            if step % (args.sampling_interval) == 0:
+                if args.video:
+                    # Store the wavefunction for visualization
+                    draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x/μm', ylabel='y/μm', title=['time = ', str(time), 'ms'], fontsize=20)
+                    writer.grab_frame()
+                    # Store the mechanical quantities
+                    ...
 
 if __name__ == "__main__":
     main()
