@@ -3,8 +3,8 @@ import cupy as cp
 
 from constants import hbar, m, e0, t0
 
-def grid(x_range:np.ndarray, y_range:np.ndarray, Nx:np.int32, Ny:np.int32
-                 ) -> tuple[cp.ndarray, cp.ndarray, cp.ndarray, cp.ndarray, np.float32, np.float32]:
+def grid(x_range:cp.ndarray, y_range:cp.ndarray, Nx:cp.int32, Ny:cp.int32
+                 ) -> tuple[cp.ndarray, cp.ndarray, cp.ndarray, cp.ndarray, cp.float32, cp.float32]:
     '''
     functionality: 
         generate a series of 2D grid, including X, Y in real space and Kx, Ky in momentum space
@@ -18,21 +18,21 @@ def grid(x_range:np.ndarray, y_range:np.ndarray, Nx:np.int32, Ny:np.int32
         [Kx, Ky]: meshgrid and fftshift of kx and ky momentums, shape (Ny, Nx)
         [dx, dy]: grid spacing in x and y directions # μm
     '''
-    vx = np.linspace(x_range[0], x_range[1], Nx)
-    vy = np.linspace(y_range[0], y_range[1], Ny)
-    [X, Y] = np.meshgrid(vx,vy)
+    vx = cp.linspace(x_range[0], x_range[1], Nx)
+    vy = cp.linspace(y_range[0], y_range[1], Ny)
+    [X, Y] = cp.meshgrid(vx,vy)
     dx = vx[1] - vx[0]
     dy = vy[1] - vy[0]
-    kx = np.fft.fftshift(np.linspace(-np.pi/dx, np.pi/dx, Nx))
-    ky = np.fft.fftshift(np.linspace(-np.pi/dy, np.pi/dy, Ny))
-    [Kx, Ky] = np.meshgrid(kx, ky)
+    kx = cp.fft.fftshift(cp.linspace(-cp.pi/dx, cp.pi/dx, Nx))
+    ky = cp.fft.fftshift(cp.linspace(-cp.pi/dy, cp.pi/dy, Ny))
+    [Kx, Ky] = cp.meshgrid(kx, ky)
     X, Y = cp.asarray(X, dtype=cp.float32), cp.asarray(Y, dtype=cp.float32)
     Kx, Ky = cp.asarray(Kx, dtype=cp.float32), cp.asarray(Ky, dtype=cp.float32)
     return (X, Y, Kx, Ky, dx, dy)
 
 def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
-             omega:np.float32, trap_center:np.ndarray, beta:np.float32, 
-             r_0:np.float32, imaginary_time:np.bool, dt:np.float32) -> tuple[cp.ndarray, cp.ndarray]:
+             omega:cp.float32, trap_center:cp.ndarray, beta:cp.float32, 
+             r_0:cp.float32, imaginary_time:np.bool, dt:cp.float32) -> tuple[cp.ndarray, cp.ndarray]:
     '''
     functionality: 
         generate a series of 2D grid, V the potential energy operator and T the kinetic energy operator
@@ -74,7 +74,7 @@ def operator(X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray,
                 ) # Here K.E. = p^2/2m / e0 = (hbar^2/2m)*k^2 / e0 = (1/2) * x0^2 * k^2 -> dimensionless
     return (U, V_sqrt, T)
 
-def Norm(psi:cp.ndarray, dx:np.float32, dy:np.float32) -> np.float32:
+def Norm(psi:cp.ndarray, dx:cp.float32, dy:cp.float32) -> cp.float32:
     '''
     functionality:
         calculate the norm of the wavefunction
@@ -87,8 +87,8 @@ def Norm(psi:cp.ndarray, dx:np.float32, dy:np.float32) -> np.float32:
     '''
     return cp.sum(cp.abs(psi)**2) * (dx*dy)
 
-def wf_Gaussian(X:cp.ndarray, Y:cp.ndarray, BEC_center:np.ndarray, omega:np.float32, 
-                dx:np.float32, dy:np.float32) -> cp.ndarray:
+def wf_Gaussian(X:cp.ndarray, Y:cp.ndarray, BEC_center:cp.ndarray, omega:cp.float32, 
+                dx:cp.float32, dy:cp.float32) -> cp.ndarray:
     '''
     functionality:
         generate a Gaussian wavefunction for the BEC
@@ -107,12 +107,12 @@ def wf_Gaussian(X:cp.ndarray, Y:cp.ndarray, BEC_center:np.ndarray, omega:np.floa
             -(m*omega/2/hbar) * ((X-BEC_center[0])**2 + (Y-BEC_center[1])**2)
             ), dtype=cp.complex64
                     )
-    return psi / np.sqrt(Norm(psi, dx, dy))
+    return psi / cp.sqrt(Norm(psi, dx, dy))
 
 def wf_ThomasFermi():
     ...
 
-def boost(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, vx:np.float32, vy:np.float32
+def boost(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, vx:cp.float32, vy:cp.float32
           ) -> cp.ndarray:
     '''
     functionality:

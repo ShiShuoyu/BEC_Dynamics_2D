@@ -3,8 +3,8 @@ import cupy as cp
 
 from constants import hbar, m, x0, e0, t0, a, ab
 
-def time_step(dt:np.float32, duration:np.float32, sampling_interval:np.int32
-              ) -> tuple[np.float32, np.float32, np.int32, np.int32]:
+def time_step(dt:cp.float32, duration:cp.float32, sampling_interval:cp.int32
+              ) -> tuple[cp.float32, cp.float32, cp.int32, cp.int32]:
     '''
     functionality:
         build up the time structure for the simulation
@@ -18,10 +18,10 @@ def time_step(dt:np.float32, duration:np.float32, sampling_interval:np.int32
         n_steps: number of time steps in the simulation
         n_samples: number of samples
     '''
-    return (dt / t0, duration / t0, int(np.round(duration / dt)), int(np.round(duration / dt / sampling_interval)))
+    return (dt / t0, duration / t0, int(cp.round(duration / dt)), int(cp.round(duration / dt / sampling_interval)))
 
 def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray, 
-                   dt:np.float32, Num:np.int32, omega_z:np.float32, imaginary_time:np.bool) -> np.ndarray:
+                   dt:cp.float32, Num:cp.int32, omega_z:cp.float32, imaginary_time:np.bool) -> cp.ndarray:
     '''
     functionality:
         evolve the wave function psi under the potential V, kinetic operator T, and interaction erengy g|ψ|^2
@@ -39,17 +39,17 @@ def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray
     '''
     loss = 1 - 0.4j if imaginary_time else 1
     # interacting strength #
-    g = (4*np.pi*Num * hbar**2 * a*ab / m / e0 / x0**3
-         ) * np.sqrt(m*omega_z/2/np.pi/hbar * x0
+    g = (4*cp.pi*Num * hbar**2 * a*ab / m / e0 / x0**3
+         ) * cp.sqrt(m*omega_z/2/cp.pi/hbar * x0
                      ) # correction for squeezing a 3D wavepacket (along z direction) into a x0 μm layer
 
     if g == 0:
         psi = psi * V_sqrt
-        psi = cp.ifft2(cp.fft2(psi) * T)
+        psi = cp.fft.ifft2(cp.fft.fft2(psi) * T)
         psi = psi * V_sqrt
     else:
         V_sqrt_g = cp.exp(-1j * (dt/2) * (U + g*cp.abs(psi)**2) * loss)
         psi = psi * V_sqrt_g
-        psi = cp.ifft2(cp.fft2(psi) * T)
+        psi = cp.fft.ifft2(cp.fft.fft2(psi) * T)
         psi = psi * V_sqrt_g
     return psi

@@ -22,10 +22,10 @@ def main():
     # Update the constants.json file with the new atomic parameters
     with open("constants.json", "r") as f:
         constants = json.load(f)
-    constants["Ar"] = args.relative_atomic_mass
-    constants["a"] = args.scattering_length
+    constants["Ar"] = int(args.relative_atomic_mass)
+    constants["a"] = float(args.scattering_length)
     with open("constants.json", "w") as f:
-        json.dump(constants, f, indent=4)
+        json.dump(constants, f, indent=4, ensure_ascii=False)
 
     # Generate the grid, operators, and initial wavefunction
     (X, Y, Kx, Ky, dx, dy) = wf.grid(x_range=(-args.radius_xy[0], args.radius_xy[0]),
@@ -43,30 +43,39 @@ def main():
     # Prepare the output arrays
     time = 0
     ...
-    # Prepare the output video
+    # output video
     if args.video:
         FFMpegWriter = animation.writers['ffmpeg']
         metadata = dict(title='BEC_Dynamics_2D', artist='matplotlib',
                         comment="Split step method")
-        writer = FFMpegWriter(fps=30, metadata=metadata)
+        writer = FFMpegWriter(fps=30, codec='h264_nvenc', metadata=metadata,  extra_args=[
+                'preset', 'q3',
+                '-b:v', '2000k', # bitrate
+                '-crf', '20'
+            ])
 
-    fig, ax = plt.subplots()
+        fig, ax = plt.subplots()
 
-    with writer.saving(fig, 'BEC_2D.mp4', 100):
-        # Time evolution loop
-        for step in range(n_steps):
-            # Evolve the wavefunction
-            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z)
-            time = time + dt
+        with writer.saving(fig, 'BEC_2D.mp4', dpi=150):
+            # Time evolution loop
+            for step in range(n_steps):
+                # Evolve the wavefunction
+                psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+                time = time + dt
 
-            # Sample the wavefunction
-            if step % (args.sampling_interval) == 0:
-                if args.video:
+                # Sample the wavefunction
+                if step % (args.sampling_interval) == 0:
                     # Store the wavefunction for visualization
-                    draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x/μm', ylabel='y/μm', title=['time = ', str(time), 'ms'], fontsize=20)
+                    draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x/μm', ylabel='y/μm', title='title', fontsize=20)
                     writer.grab_frame()
                     # Store the mechanical quantities
                     ...
+    else:
+        for step in range(n_steps):
+            # Evolve the wavefunction
+            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+            time = time + dt
+    print('\ndone!')
 
 if __name__ == "__main__":
     main()

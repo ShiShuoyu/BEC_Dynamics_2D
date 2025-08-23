@@ -3,7 +3,7 @@ import cupy as cp
 import matplotlib.pyplot as plt
 
 def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str, 
-           xlabel:str, ylabel:str, title:str, fontsize:np.float32) -> None:
+           xlabel:str, ylabel:str, title:str, fontsize:float) -> None:
     '''
     functionality:
         plot the density distribution of the wavepacket
@@ -13,17 +13,21 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         colormap: colormap for the density plot
     '''
-    psi = cp.asnumpy(psi)
     xmin = cp.asnumpy(cp.min(X))
     xmax = cp.asnumpy(cp.max(X))
     ymin = cp.asnumpy(cp.min(Y))
     ymax = cp.asnumpy(cp.max(Y))
-    plt.imshow(np.abs(psi)**2, extent=(xmin,xmax,ymin,ymax), cmap=colormap, xlabel=xlabel, ylabel=ylabel, title=title, fontsize=fontsize)
-    plt.show()
+    plt.imshow(cp.asnumpy(cp.abs(psi)**2), extent=(xmin,xmax,ymin,ymax), cmap=colormap)
+    
+    ax = plt.gca()
+    ax.set_xlabel(xlabel, fontsize=fontsize)
+    ax.set_ylabel(ylabel, fontsize=fontsize)
+    ax.set_title(title, fontsize=fontsize)
+
     return
 
 def flow(Fx:cp.ndarray, Fy:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, 
-         color:str, width:np.float32) -> None:
+         color:str, width:float) -> None:
     Fx = cp.asnumpy(Fx)
     Fy = cp.asnumpy(Fy)
     X = cp.asnumpy(X)

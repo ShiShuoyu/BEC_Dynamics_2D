@@ -1,7 +1,7 @@
 import numpy as np
 import json
 
-with open('constants.json', 'w') as f:
+with open('constants.json', 'r') as f:
     const = json.load(f)
 
 # physical constants #

@@ -2,7 +2,7 @@ import numpy as np
 import cupy as cp
 
 def COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
-        ) -> tuple[np.float32, np.float32]:
+        ) -> tuple[cp.float32, cp.float32]:
     '''
     functionality:
         find the center of mass of the wavepacket
@@ -14,12 +14,12 @@ def COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
         (Cx, Cy): center of mass of the wavepacket, shape (2,) # μm
     '''
     return (
-        cp.asnumpy(cp.sum(X * cp.abs(psi)**2) / cp.sum(cp.abs(psi)**2)),
-        cp.asnumpy(cp.sum(Y * cp.abs(psi)**2) / cp.sum(cp.abs(psi)**2))
+        cp.sum(X * cp.abs(psi)**2) / cp.sum(cp.abs(psi)**2),
+        cp.sum(Y * cp.abs(psi)**2) / cp.sum(cp.abs(psi)**2)
     )
 
-def Iz(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:np.float32, dy:np.float32
-       ) -> np.float32:
+def Iz(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32
+       ) -> cp.float32:
     '''
     functionality:
         get the moment of inertia around z axis
@@ -34,8 +34,8 @@ def Iz(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:np.float32, dy:np.float32
     '''
     return cp.sum(cp.abs(psi)**2 * (X**2 + Y**2)) * (dx*dy)
 
-def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:np.float32, dy:np.float32
-         ) -> np.float32:
+def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32
+         ) -> cp.float32:
     '''
     functionality:
         get the moment of inertia around COM along z axis
@@ -50,10 +50,9 @@ def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:np.float32, dy:np.float3
     '''
     (Cx, Cy) = COM(psi, X, Y)
     return cp.sum(cp.abs(psi)**2 * ((X-Cx)**2 + (Y-Cy)**2)) * (dx*dy)
-    ...
 
-def wo_COM(ps:cp.ndarrayi, X:cp.ndarray, Y:cp.ndarray, 
-           Kx:cp.ndarray, Ky:cp.ndarray, Nx:np.int32, Ny:np.int32) -> cp.ndarray:
+def wo_COM(ps:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, 
+           Kx:cp.ndarray, Ky:cp.ndarray, Nx:cp.int32, Ny:cp.int32) -> cp.ndarray:
     '''
     functionality:
         get the wavepacket without COM motion by cleaning the plane wave component
@@ -64,7 +63,7 @@ def wo_COM(ps:cp.ndarrayi, X:cp.ndarray, Y:cp.ndarray,
     ...
 
 def flow_fidle(psi:cp.ndarray, psi1:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
-               Nx:np.int32, Ny:np.int32
+               Nx:cp.int32, Ny:cp.int32
                ) -> tuple[cp.ndarray, cp.ndarray, cp.ndarray, cp.ndarray]:
     '''
     functionality:
@@ -80,7 +79,7 @@ def flow_fidle(psi:cp.ndarray, psi1:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray,
 
 def rotate(psi:cp.ndarray, Fx:cp.ndarray, Fy:cp.ndarray, 
            Fx1:cp.ndarray, Fy1:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
-           ) -> tuple[np.float32, np.float32, np.float32, np.float32]:
+           ) -> tuple[cp.float32, cp.float32, cp.float32, cp.float32]:
     '''
     functionality:
         get the angular momentum and angular velocity, for self-rotation and total-rotation
@@ -93,7 +92,7 @@ def rotate(psi:cp.ndarray, Fx:cp.ndarray, Fy:cp.ndarray,
     ...
 
 def eigenaxis_angle(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray,
-                    ) -> tuple[np.float32, np.float32]:
+                    ) -> tuple[cp.float32, cp.float32]:
     '''
     functionality:
         find the polar angle of eigenaxis of the wavepacket's inertia tensor
