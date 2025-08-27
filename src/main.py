@@ -34,6 +34,9 @@ def main():
     args.omega_bec = args.omega_bec / t0
     args.omega_trap_z = args.omega_trap_z / t0
 
+    # Generate the time structure
+    (dt, duration, n_steps, n_samples) = ev.time_step(dt=args.dt, duration=args.duration, sampling_interval=args.sampling_interval)
+
     # Generate the grid, operators, and initial wavefunction
     (X, Y, Kx, Ky, dx, dy) = wf.grid(x_range=(-args.radius_xy[0], args.radius_xy[0]),
                                       y_range=(-args.radius_xy[1], args.radius_xy[1]),
@@ -44,10 +47,8 @@ def main():
     psi = wf.wf_Gaussian(X=X, Y=Y, BEC_center=np.array(args.center_bec), omega=args.omega_bec, dx=dx, dy=dy)
     psi = wf.boost(psi=psi, X=X, Y=Y, vx=args.velocity[0], vy=args.velocity[1])
 
-    # Generate the time structure
-    (dt, duration, n_steps, n_samples) = ev.time_step(dt=args.dt, duration=args.duration, sampling_interval=args.sampling_interval)
-
     # Prepare the output arrays
+    n_steps = n_steps + 1 # include the last step
     time = 0
     ...
     # output video
@@ -72,16 +73,32 @@ def main():
                     writer.grab_frame()
 
                 # Evolve the wavefunction
-                psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+                psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
                 time = time + dt*t0 # physical time
-    else:
+    elif args.mechanics:
         for step in tqdm(range(n_steps)):
             # Evolve the wavefunction
-            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
-            time = time + dt
+            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+            time = time + dt*t0
             if step % (args.sampling_interval) == 0:
                 # Store the mechanical quantities
                 ...
+    else:
+        for step in tqdm(range(n_steps)):
+            # Evolve the wavefunction
+            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+            time = time + dt*t0
+    if args.figure:
+        print('\nsaving figures ...')
+        # density profile
+        draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'density_t{time:.0f}ms.png')
+
+        # flow field
+        psi1 = mc.wo_COM(psi=psi, X=X, Y=Y, Kx=Kx, Ky=Ky, dx=dx, dy=dy)
+        (Fx,Fy,Fx1,Fy1) = mc.flow_field(psi=psi, psi1=psi1, Kx=Kx, Ky=Ky)
+        draw.flow(Fx=Fx, Fy=Fy, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'flow_t{time:.0f}ms.png')
+        draw.flow(Fx=Fx1, Fy=Fy1, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field w/o COM at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'flow1_t{time:.0f}ms.png')
+    
     print('\ndone!')
 
 if __name__ == "__main__":

@@ -10,3 +10,4 @@ dependencies:
   - cupy=13.4.1
   - argparse=1.4.0
   - tqdm=4.67.1
+  - scikit-image=0.25.2

@@ -1,0 +1,3 @@
+(run the following code in the terminal opened the path ./src)
+
+python .\main.py --number_xy 512 512 --duration 170 --figure

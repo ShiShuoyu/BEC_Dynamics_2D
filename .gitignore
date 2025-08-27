@@ -1,3 +1,5 @@
-*.mp4
-__pycache__/
-*.pyc
+.mp4
+.png
+src/*.mp4
+src/__pycache__/
+src/*.png

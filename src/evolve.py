@@ -48,7 +48,7 @@ def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray
         psi = cp.fft.ifft2(cp.fft.fft2(psi) * T)
         psi = psi * V_sqrt
     else:
-        V_sqrt_g = cp.exp(-1j * (dt/2) * (U + g*cp.abs(psi)**2) * loss)
+        V_sqrt_g = cp.exp(-1j * loss * (dt/2) * (U + g*cp.abs(psi)**2))
         psi = psi * V_sqrt_g
         psi = cp.fft.ifft2(cp.fft.fft2(psi) * T)
         psi = psi * V_sqrt_g

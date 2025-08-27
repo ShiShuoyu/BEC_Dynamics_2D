@@ -1,6 +1,9 @@
 import numpy as np
 import cupy as cp
 
+from constants import hbar, m, x0, t0, e0
+from wf import Norm
+
 def COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
         ) -> tuple[cp.float32, cp.float32]:
     '''
@@ -30,9 +33,9 @@ def Iz(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32
         dx: grid spacing in x direction # μm
         dy: grid spacing in y direction # μm
     output:
-        Iz: moment of inertia around z axis
+        Iz: moment of inertia around z axis (kg*μm^2/ms)
     '''
-    return cp.sum(cp.abs(psi)**2 * (X**2 + Y**2)) * (dx*dy)
+    return cp.sum(cp.abs(psi)**2 * (X**2 + Y**2)) * (dx*dy) * (m*x0**2/t0)
 
 def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32
          ) -> cp.float32:
@@ -46,36 +49,54 @@ def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float3
         dx: grid spacing in x direction # μm
         dy: grid spacing in y direction # μm
     output:
-        Iz_c: moment of inertia around COM along z axis
+        Iz_c: moment of inertia around COM along z axis (kg*μm^2/ms)
     '''
     (Cx, Cy) = COM(psi, X, Y)
-    return cp.sum(cp.abs(psi)**2 * ((X-Cx)**2 + (Y-Cy)**2)) * (dx*dy)
+    return cp.sum(cp.abs(psi)**2 * ((X-Cx)**2 + (Y-Cy)**2)) * (dx*dy) * (m*x0**2/t0)
 
-def wo_COM(ps:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, 
-           Kx:cp.ndarray, Ky:cp.ndarray, Nx:cp.int32, Ny:cp.int32) -> cp.ndarray:
+def wo_COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
+           dx:cp.float32, dy:cp.float32) -> cp.ndarray:
     '''
     functionality:
         get the wavepacket without COM motion by cleaning the plane wave component
     input:
+        psi: wavefunction, shape (Ny, Nx)
+        X: x coordinates meshgrid, shape (Ny, Nx) # μm
+        Y: y coordinates meshgrid, shape (Ny, Nx) # μm
+
     output:
         psi1: wavefunction without COM motion, shape (Ny, Nx)
     '''
-    ...
+    for _ in range(8): # iterate a few times to converge
+        Fx = cp.conj(psi) * cp.fft.ifft2(Kx * cp.fft.fft2(psi,axes=(1,)),axes=(1,)) * (hbar/m)
+        Fy = -cp.conj(psi) * cp.fft.ifft2(Ky * cp.fft.fft2(psi,axes=(0,)),axes=(0,)) * (hbar/m)
+        Px = cp.sum(Fx).real * (dx*dy) * m # total momentum in x direction (kg*μm/ms)
+        Py = cp.sum(Fy).real * (dx*dy) * m # total momentum in y direction (kg*μm/ms)
+        psi = psi * cp.exp(-1j * (Px*X + Py*Y) / hbar)
+    return psi
 
-def flow_fidle(psi:cp.ndarray, psi1:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
-               Nx:cp.int32, Ny:cp.int32
+def flow_field(psi:cp.ndarray, psi1:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
                ) -> tuple[cp.ndarray, cp.ndarray, cp.ndarray, cp.ndarray]:
     '''
     functionality:
         get the flow field (velocity field times density field) of the wavepacket
     input:
+        psi: wavefunction, shape (Ny, Nx)
+        psi1: wavefunction without COM motion, shape (Ny, Nx)
+        Kx: kx coordinates meshgrid, shape (Ny, Nx) # μm^-1
+        Ky: ky coordinates meshgrid, shape (Ny, Nx) # μm^-1
     output:
-        Fx: x component of the flow field, shape (Ny, Nx)
-        Fy: y component of the flow field, shape (Ny, Nx)
-        Fx1: x component of the flow field without COM motion, shape (Ny, Nx)
-        Fy1: y component of the flow field without COM motion, shape (Ny, Nx)
+        Fx: x component of the flow field, shape (Ny, Nx) # (μm*ms)^(-1)
+        Fy: y component of the flow field, shape (Ny, Nx) # (μm*ms)^(-1)
+        Fx1: x component of the flow field without COM motion, shape (Ny, Nx) # (μm*ms)^(-1)
+        Fy1: y component of the flow field without COM motion, shape (Ny, Nx) # (μm*ms)^(-1)
     '''
-    ...
+    Fx = cp.conj(psi) * cp.fft.ifft2(Kx * cp.fft.fft2(psi,axes=(1,)),axes=(1,)) * (hbar/m)
+    Fy = -cp.conj(psi) * cp.fft.ifft2(Ky * cp.fft.fft2(psi,axes=(0,)),axes=(0,)) * (hbar/m)
+    Fx1 = cp.conj(psi1) * cp.fft.ifft2(Kx * cp.fft.fft2(psi1,axes=(1,)),axes=(1,)) * (hbar/m)
+    Fy1 = -cp.conj(psi1) * cp.fft.ifft2(Ky * cp.fft.fft2(psi1,axes=(0,)),axes=(0,)) * (hbar/m)
+    
+    return (cp.real(Fx), cp.real(Fy), cp.real(Fx1), cp.real(Fy1))
 
 def rotate(psi:cp.ndarray, Fx:cp.ndarray, Fy:cp.ndarray, 
            Fx1:cp.ndarray, Fy1:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
