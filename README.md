@@ -1,6 +1,10 @@
 # BEC_Dynamics_2D
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ShiShuoyu/BEC_Dynamics_2D/blob/main/LICENSE)
 
+<div align=center>
+<img src="./readme_fig/figure_example.png" width="750"/>
+</div>
+
 Simulating and visualizing the mechanical motion of 2D Bose-Einstein condensates (BECs)  
 *(This repository is under construction...)*
 
@@ -63,5 +67,6 @@ conda activate env_bec
 2. try examples
 ```Terminal
 cd src
+python main.py --help
 python main.py --video
 ```

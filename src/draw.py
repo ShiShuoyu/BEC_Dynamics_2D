@@ -21,6 +21,8 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
     plt.imshow(cp.asnumpy(cp.abs(psi)**2), extent=(xmin,xmax,ymin,ymax), cmap=colormap)
     
     ax = plt.gca()
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
     ax.set_xlabel(xlabel, fontsize=fontsize)
     ax.set_ylabel(ylabel, fontsize=fontsize)
     ax.set_title(title, fontsize=fontsize)
@@ -35,18 +37,24 @@ def flow(Fx:cp.ndarray, Fy:cp.ndarray, X:cp.ndarray, Y:cp.ndarray,
          color:str, width:float, xlabel:str, ylabel:str, title:str, fontsize:float, reduce_exponent:int, file_name:str) -> None:
     '''
     '''
+    xmin = cp.asnumpy(cp.min(X))
+    xmax = cp.asnumpy(cp.max(X))
+    ymin = cp.asnumpy(cp.min(Y))
+    ymax = cp.asnumpy(cp.max(Y))
     n = 2**reduce_exponent
     X_reduced = block_reduce(cp.asnumpy(X), block_size=(n,n), func=np.mean)
     Y_reduced = block_reduce(cp.asnumpy(Y), block_size=(n,n), func=np.mean)
     Fx_reduced = block_reduce(cp.asnumpy(Fx), block_size=(n,n), func=np.mean)
     Fy_reduced = block_reduce(cp.asnumpy(Fy), block_size=(n,n), func=np.mean)
-    dx = cp.asnumpy(X[0,1]-X[0,0])
+    dx = float(X[0,1] - X[0,0])
 
     # to avoid overcrowding
     F2_max = np.max(Fx_reduced**2 + Fy_reduced**2)
-    plt.quiver(X_reduced, Y_reduced, Fx_reduced, Fy_reduced, angles='xy', color=color, width=width, pivot='mid', scale=F2_max**0.5*550/n)
+    plt.quiver(X_reduced, Y_reduced, Fx_reduced, Fy_reduced, angles='xy', color=color, width=width, pivot='mid', scale=F2_max**0.5*100/n/dx)
 
     ax = plt.gca()
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
     ax.set_xlabel(xlabel, fontsize=fontsize)
     ax.set_ylabel(ylabel, fontsize=fontsize)
     ax.set_title(title, fontsize=fontsize)
@@ -56,3 +64,6 @@ def flow(Fx:cp.ndarray, Fy:cp.ndarray, X:cp.ndarray, Y:cp.ndarray,
     plt.clf()
 
     return
+
+def combine():
+    ...
