@@ -3,6 +3,39 @@ import cupy as cp
 import matplotlib.pyplot as plt
 from skimage.measure import block_reduce
 
+def camera_video(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str, 
+           xlabel:str, ylabel:str, title:str, fontsize:float) -> None:
+    '''
+    functionality:
+        plot the density distribution of the wavepacket for video
+    input:
+        psi: wavefunction, shape (Ny, Nx)
+        X: x coordinates meshgrid, shape (Ny, Nx) # μm
+        Y: y coordinates meshgrid, shape (Ny, Nx) # μm
+        colormap: colormap for the density plot
+        xlabel: label for x axis
+        ylabel: label for y axis
+        title: title of the figure
+        fontsize: fontsize for the labels and title
+    output:
+        none
+    '''
+    xmin = cp.asnumpy(cp.min(X))
+    xmax = cp.asnumpy(cp.max(X))
+    ymin = cp.asnumpy(cp.min(Y))
+    ymax = cp.asnumpy(cp.max(Y))
+    plt.imshow(cp.asnumpy(cp.abs(psi)**2), extent=(xmin,xmax,ymin,ymax), cmap=colormap)
+    
+    ax = plt.gca()
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.set_xlabel(xlabel, fontsize=fontsize)
+    ax.set_ylabel(ylabel, fontsize=fontsize)
+    ax.set_title(title, fontsize=fontsize)
+    ax.set_aspect('equal')
+
+    return
+
 def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str, 
            xlabel:str, ylabel:str, title:str, fontsize:float, file_name:str) -> None:
     '''
@@ -13,6 +46,13 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
         X: x coordinates meshgrid, shape (Ny, Nx) # μm
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         colormap: colormap for the density plot
+        xlabel: label for x axis
+        ylabel: label for y axis
+        title: title of the figure
+        fontsize: fontsize for the labels and title
+        file_name: name of the output file
+    output:
+        none
     '''
     xmin = cp.asnumpy(cp.min(X))
     xmax = cp.asnumpy(cp.max(X))
@@ -36,6 +76,21 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
 def flow(Fx:cp.ndarray, Fy:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, 
          color:str, width:float, xlabel:str, ylabel:str, title:str, fontsize:float, reduce_exponent:int, file_name:str) -> None:
     '''
+    functionality:
+        plot the flow field of the wavepacket
+    input:
+        Fx: flow field in x direction, shape (Ny, Nx)
+        Fy: flow field in y direction, shape (Ny, Nx)
+        X: x coordinates meshgrid, shape (Ny, Nx) # μm
+        Y: y coordinates meshgrid, shape (Ny, Nx) # μm
+        color: color of the arrows
+        width: width of the arrows
+        xlabel: label for x axis
+        ylabel: label for y axis
+        title: title of the figure
+        fontsize: fontsize for the labels and title
+        reduce_exponent: reduce the number of arrows by a factor of 2**reduce_exponent
+        file_name: name of the output file
     '''
     xmin = cp.asnumpy(cp.min(X))
     xmax = cp.asnumpy(cp.max(X))

@@ -63,7 +63,8 @@ def wo_COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndar
         psi: wavefunction, shape (Ny, Nx)
         X: x coordinates meshgrid, shape (Ny, Nx) # μm
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
-
+        Kx: kx coordinates meshgrid, shape (Ny, Nx) # μm^-1
+        Ky: ky coordinates meshgrid, shape (Ny, Nx) # μm^-1
     output:
         psi1: wavefunction without COM motion, shape (Ny, Nx)
     '''
@@ -106,6 +107,10 @@ def rotate(psi:cp.ndarray, Fx:cp.ndarray, Fy:cp.ndarray,
         get the angular momentum and angular velocity, for self-rotation and total-rotation
     input:
         psi: wavefunction, shape (Ny, Nx)
+        Fx: x component of the flow field, shape (Ny, Nx) # (μm*ms)^(-1)
+        Fy: y component of the flow field, shape (Ny, Nx) # (μm*ms)^(-1)
+        Fx1: x component of the flow field without COM motion, shape (Ny, Nx) # (μm*ms)^(-1)
+        Fy1: y component of the flow field without COM motion, shape (Ny, Nx) # (μm*ms)^(-1)
     output:
         (Lz_tot, Lz_sr): total angular momentum and self-rotation angular momentum # ???
         (w_tot, w_sr): total angular velocity and self-rotation angular velocity # ???

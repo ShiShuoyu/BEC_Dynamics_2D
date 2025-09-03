@@ -69,7 +69,7 @@ def main():
                 # Sample the wavefunction
                 if step % (args.sampling_interval) == 0:
                     # Store the wavefunction for visualization
-                    draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16)
+                    draw.camera_video(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16)
                     writer.grab_frame()
 
                 # Evolve the wavefunction
