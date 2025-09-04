@@ -125,4 +125,8 @@ def boost(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, vx:cp.float32, vy:cp.float
     output:
         psi: boosted wavefunction, shape (Ny, Nx)
     '''
-    return psi * cp.exp(1j * (vx*X + vy*Y)) # need to be fixed
+    # here vx = kx, vy = ky numerically
+    # for v = hk/m (with units)
+    # dimensionless: v -> v/x0*t0, k -> k*x0
+    # v/x0*t0 = k*x0
+    return psi * cp.exp(1j * (vx*X + vy*Y))

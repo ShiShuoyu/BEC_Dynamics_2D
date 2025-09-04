@@ -49,9 +49,20 @@ def main():
 
     # Prepare the output arrays
     n_steps = n_steps + 1 # include the last step
-    time = 0
-    ...
-    # output video
+    time = 0 # ms
+    idx_sampling = 0 # index for sampling
+    time_list = cp.zeros(n_samples, dtype=cp.float32)
+    Iz_tot_list = cp.zeros(n_samples, dtype=cp.float32)
+    Iz_sr_list = cp.zeros(n_samples, dtype=cp.float32)
+    Lz_tot_list = cp.zeros(n_samples, dtype=cp.float32)
+    Lz_sr_list = cp.zeros(n_samples, dtype=cp.float32)
+    omega_tot_list = cp.zeros(n_samples, dtype=cp.float32)
+    omega_sr_list = cp.zeros(n_samples, dtype=cp.float32)
+
+    if args.video and args.mechanics:
+        print("Error: --video and --mechanics cannot be set at the same time.")
+        return
+    # time evolution loop
     if args.video:
         FFMpegWriter = animation.writers['ffmpeg']
         metadata = dict(title='BEC_Dynamics_2D', artist='matplotlib',
@@ -63,7 +74,7 @@ def main():
 
         fig, ax = plt.subplots()
 
-        with writer.saving(fig, 'BEC_2D.mp4', dpi=150):
+        with writer.saving(fig, 'output/BEC_2D.mp4', dpi=150):
             # Time evolution loop
             for step in tqdm(range(n_steps)):
                 # Sample the wavefunction
@@ -77,29 +88,51 @@ def main():
                 time = time + dt*t0 # physical time
     elif args.mechanics:
         for step in tqdm(range(n_steps)):
+            if step % (args.sampling_interval) == 0:
+                # Mechanical quantities
+                psi1 = mc.wo_COM(psi=psi, X=X, Y=Y, Kx=Kx, Ky=Ky, dx=dx, dy=dy)
+                Iz_tot = mc.Iz(psi=psi, X=X, Y=Y, dx=dx, dy=dy, Num=args.atom_number)
+                Iz_sr = mc.Iz_c(psi=psi, X=X, Y=Y, dx=dx, dy=dy, Num=args.atom_number)
+                (Fx,Fy,Fx1,Fy1) = mc.flow_field(psi=psi, psi1 = psi1, Kx=Kx, Ky=Ky)
+                (Lz_tot, Lz_sr, omega_tot, omega_sr) = mc.rotate(Fx=Fx, Fy=Fy, Fx1=Fx1, Fy1=Fy1, dx=dx, dy=dy, X=X, Y=Y, Num=args.atom_number, Iz_tot=Iz_tot, Iz_sr=Iz_sr)
+                # Store the mechanical quantities
+                time_list[idx_sampling] = time
+                Iz_tot_list[idx_sampling] = Iz_tot
+                Iz_sr_list[idx_sampling] = Iz_sr
+                Lz_tot_list[idx_sampling] = Lz_tot
+                Lz_sr_list[idx_sampling] = Lz_sr
+                omega_tot_list[idx_sampling] = omega_tot
+                omega_sr_list[idx_sampling] = omega_sr
+                idx_sampling = idx_sampling + 1
             # Evolve the wavefunction
             psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
             time = time + dt*t0
-            if step % (args.sampling_interval) == 0:
-                # Store the mechanical quantities
-                ...
     else:
         for step in tqdm(range(n_steps)):
             # Evolve the wavefunction
             psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
             time = time + dt*t0
-    if args.figure:
+    if args.figure: # output the density profile and flow field of the final state
         print('\nsaving figures ...')
         # density profile
-        draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'density_t{time:.0f}ms.png')
+        draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/density_t{time:.0f}ms.png')
 
         # flow field
         psi1 = mc.wo_COM(psi=psi, X=X, Y=Y, Kx=Kx, Ky=Ky, dx=dx, dy=dy)
         (Fx,Fy,Fx1,Fy1) = mc.flow_field(psi=psi, psi1=psi1, Kx=Kx, Ky=Ky)
-        draw.flow(Fx=Fx, Fy=Fy, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'flow_t{time:.0f}ms.png')
-        draw.flow(Fx=Fx1, Fy=Fy1, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field w/o COM at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'flow1_t{time:.0f}ms.png')
+        draw.flow(Fx=Fx, Fy=Fy, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'output/flow_t{time:.0f}ms.png')
+        draw.flow(Fx=Fx1, Fy=Fy1, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field w/o COM at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'output/flow1_t{time:.0f}ms.png')
+    if args.mechanics: # output the time evolution of mechanical quantities
+        print('\nsaving mechanical quantities ...')
+        draw.quantity(time=time_list, quantity=Iz_tot_list, xlabel='time (ms)', ylabel='Iz_tot (kg*μm^2)', title='Moment of inertia around z', fontsize=16, file_name='output/Iz_tot.png')
+        draw.quantity(time=time_list, quantity=Iz_sr_list, xlabel='time (ms)', ylabel='Iz_sr (kg*μm^2)', title='Moment of inertia around COM', fontsize=16, file_name='output/Iz_sr.png')
+        draw.quantity(time=time_list, quantity=Lz_tot_list, xlabel='time (ms)', ylabel='Lz_tot (kg*μm^2/ms)', title='Total angular momentum', fontsize=16, file_name='output/Lz_tot.png')
+        draw.quantity(time=time_list, quantity=Lz_sr_list, xlabel='time (ms)', ylabel='Lz_sr (kg*μm^2/ms)', title='Intrinsic angular momentum', fontsize=16, file_name='output/Lz_sr.png')
+        draw.quantity(time=time_list, quantity=omega_tot_list, xlabel='time (ms)', ylabel='omega_tot (ms^-1)', title='Total angular velocity', fontsize=16, file_name='output/omega_tot.png')
+        draw.quantity(time=time_list, quantity=omega_sr_list, xlabel='time (ms)', ylabel='omega_sr (ms^-1)', title='Intrinsic angular velocity', fontsize=16, file_name='output/omega_sr.png')
     
     print('\ndone!')
+    return
 
 if __name__ == "__main__":
     main()

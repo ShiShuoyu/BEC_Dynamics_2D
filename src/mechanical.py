@@ -21,8 +21,8 @@ def COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
         cp.sum(Y * cp.abs(psi)**2) / cp.sum(cp.abs(psi)**2)
     )
 
-def Iz(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32
-       ) -> cp.float32:
+def Iz(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32, 
+       Num:cp.int32) -> cp.float32:
     '''
     functionality:
         get the moment of inertia around z axis
@@ -32,13 +32,14 @@ def Iz(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         dx: grid spacing in x direction # μm
         dy: grid spacing in y direction # μm
+        Num: number of atoms
     output:
         Iz: moment of inertia around z axis (kg*μm^2/ms)
     '''
-    return cp.sum(cp.abs(psi)**2 * (X**2 + Y**2)) * (dx*dy) * (m*x0**2/t0)
+    return Num * cp.sum(cp.abs(psi)**2 * (X**2 + Y**2)) * (dx*dy) * (m*x0**2/t0)
 
-def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32
-         ) -> cp.float32:
+def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float32, 
+         Num:cp.int32) -> cp.float32:
     '''
     functionality:
         get the moment of inertia around COM along z axis
@@ -48,11 +49,12 @@ def Iz_c(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, dx:cp.float32, dy:cp.float3
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         dx: grid spacing in x direction # μm
         dy: grid spacing in y direction # μm
+        Num: number of atoms
     output:
         Iz_c: moment of inertia around COM along z axis (kg*μm^2/ms)
     '''
     (Cx, Cy) = COM(psi, X, Y)
-    return cp.sum(cp.abs(psi)**2 * ((X-Cx)**2 + (Y-Cy)**2)) * (dx*dy) * (m*x0**2/t0)
+    return Num * cp.sum(cp.abs(psi)**2 * ((X-Cx)**2 + (Y-Cy)**2)) * (dx*dy) * (m*x0**2/t0)
 
 def wo_COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray, 
            dx:cp.float32, dy:cp.float32) -> cp.ndarray:
@@ -99,8 +101,9 @@ def flow_field(psi:cp.ndarray, psi1:cp.ndarray, Kx:cp.ndarray, Ky:cp.ndarray,
     
     return (cp.real(Fx), cp.real(Fy), cp.real(Fx1), cp.real(Fy1))
 
-def rotate(psi:cp.ndarray, Fx:cp.ndarray, Fy:cp.ndarray, 
-           Fx1:cp.ndarray, Fy1:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
+def rotate(Fx:cp.ndarray, Fy:cp.ndarray, Fx1:cp.ndarray, Fy1:cp.ndarray, 
+           dx:cp.float32, dy:cp.float32, X:cp.ndarray, Y:cp.ndarray, Num:cp.int32, 
+           Iz_tot:cp.float32, Iz_sr:cp.float32
            ) -> tuple[cp.float32, cp.float32, cp.float32, cp.float32]:
     '''
     functionality:
@@ -113,9 +116,13 @@ def rotate(psi:cp.ndarray, Fx:cp.ndarray, Fy:cp.ndarray,
         Fy1: y component of the flow field without COM motion, shape (Ny, Nx) # (μm*ms)^(-1)
     output:
         (Lz_tot, Lz_sr): total angular momentum and self-rotation angular momentum # ???
-        (w_tot, w_sr): total angular velocity and self-rotation angular velocity # ???
+        (omega_tot, omega_sr): total angular velocity and self-rotation angular velocity # ms^-1
     '''
-    ...
+    Lz_tot = m * cp.sum(X*Fy - Y*Fx) * (dx*dy) * (m/hbar) * Num * x0**2
+    Lz_sr = m * cp.sum(X*Fy1 - Y*Fx1)* (dx*dy) * (m/hbar) * Num * x0**2
+    omega_tot = Lz_tot / Iz_tot / t0 if Iz_tot != 0 else cp.float32(0)
+    omega_sr = Lz_sr / Iz_sr / t0 if Iz_sr != 0 else cp.float32(0)
+    return (Lz_tot, Lz_sr, omega_tot, omega_sr)
 
 def eigenaxis_angle(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray,
                     ) -> tuple[cp.float32, cp.float32]:

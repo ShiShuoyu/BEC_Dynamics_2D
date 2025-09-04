@@ -18,7 +18,7 @@ def time_step(dt:cp.float32, duration:cp.float32, sampling_interval:cp.int32
         n_steps: number of time steps in the simulation
         n_samples: number of samples
     '''
-    return (dt / t0, duration / t0, int(cp.round(duration / dt)), int(cp.round(duration / dt / sampling_interval)))
+    return (dt / t0, duration / t0, int(cp.round(duration / dt)), int(cp.round(duration / dt / sampling_interval)+1))
 
 def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray, 
                    dt:cp.float32, Num:cp.int32, omega_z:cp.float32, imaginary_time:np.bool) -> cp.ndarray:

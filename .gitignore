@@ -1,5 +1,6 @@
 .mp4
 .png
 src/*.mp4
-src/__pycache__/
 src/*.png
+src/__pycache__/
+src/output/

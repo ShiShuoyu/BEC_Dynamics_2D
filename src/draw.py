@@ -17,8 +17,6 @@ def camera_video(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
         ylabel: label for y axis
         title: title of the figure
         fontsize: fontsize for the labels and title
-    output:
-        none
     '''
     xmin = cp.asnumpy(cp.min(X))
     xmax = cp.asnumpy(cp.max(X))
@@ -51,8 +49,6 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
         title: title of the figure
         fontsize: fontsize for the labels and title
         file_name: name of the output file
-    output:
-        none
     '''
     xmin = cp.asnumpy(cp.min(X))
     xmax = cp.asnumpy(cp.max(X))
@@ -68,7 +64,7 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
     ax.set_title(title, fontsize=fontsize)
     ax.set_aspect('equal')
 
-    plt.savefig(file_name, dpi=1200)
+    plt.savefig(file_name, dpi=600)
     plt.clf()
 
     return
@@ -115,10 +111,41 @@ def flow(Fx:cp.ndarray, Fy:cp.ndarray, X:cp.ndarray, Y:cp.ndarray,
     ax.set_title(title, fontsize=fontsize)
     ax.set_aspect('equal')
 
-    plt.savefig(file_name, dpi=1200)
+    plt.savefig(file_name, dpi=600)
     plt.clf()
 
     return
 
 def combine():
     ...
+
+def quantity(time:cp.ndarray, quantity:cp.ndarray, xlabel:str, ylabel:str, title:str, fontsize:float, 
+             file_name:str) -> None:
+    '''
+    functionality:
+        plot the time variation of physical quantities
+    input:
+        time: time of sampling points # ms
+        quantity: physical quantity at sampling points # units
+        xlabel: label for x axis
+        ylabel: label for y axis
+        title: title of the figure
+        fontsize: fontsize for the labels and title
+        file_name: file name of the output figure
+    '''
+    xmin = cp.asnumpy(cp.min(time) - 0.05*(cp.max(time)-cp.min(time)))
+    xmax = cp.asnumpy(cp.max(time) + 0.05*(cp.max(time)-cp.min(time)))
+    ymin = cp.asnumpy(cp.min(quantity) - 0.05*(cp.max(quantity)-cp.min(quantity)))
+    ymax = cp.asnumpy(cp.max(quantity) + 0.05*(cp.max(quantity)-cp.min(quantity)))
+
+    plt.plot(cp.asnumpy(time), cp.asnumpy(quantity), linewidth=2)
+    ax = plt.gca()
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.set_xlabel(xlabel, fontsize=fontsize)
+    ax.set_ylabel(ylabel, fontsize=fontsize)
+    ax.set_title(title, fontsize=fontsize)
+
+    plt.savefig(file_name, dpi=600)
+    plt.clf()
+    return
