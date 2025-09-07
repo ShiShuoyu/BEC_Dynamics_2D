@@ -1,8 +1,7 @@
 import numpy as np
 import cupy as cp
 
-from constants import hbar, m, x0, t0, e0
-from wf import Norm
+from constants import hbar, m, x0, t0
 
 def COM(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray
         ) -> tuple[cp.float32, cp.float32]:
@@ -138,3 +137,14 @@ def eigenaxis_angle(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray,
         ang_s: the polar angle of the eigenaxis whose eigenvalue is smaller # rad
     '''
     ...
+
+def save_quantities(time_list:list, Iz_tot_list:list, Iz_sr_list:list, 
+                    Lz_tot_list:list, Lz_sr_list:list, omega_tot_list:list, 
+                    omega_sr_list:list) -> None:
+    np.save('output/time.npy', time_list)
+    np.save('output/Iz_tot.npy', Iz_tot_list)
+    np.save('output/Iz_sr.npy', Iz_sr_list)
+    np.save('output/Lz_tot.npy', Lz_tot_list)
+    np.save('output/Lz_sr.npy', Lz_sr_list)
+    np.save('output/omega_tot.npy', omega_tot_list)
+    np.save('output/omega_sr.npy', omega_sr_list)

@@ -21,7 +21,7 @@ def time_step(dt:cp.float32, duration:cp.float32, sampling_interval:cp.int32
     return (dt / t0, duration / t0, int(cp.round(duration / dt)), int(cp.round(duration / dt / sampling_interval)+1))
 
 def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray, 
-                   dt:cp.float32, Num:cp.int32, omega_z:cp.float32, imaginary_time:np.bool) -> cp.ndarray:
+                   dt:cp.float32, g:cp.float32, imaginary_time:np.bool) -> cp.ndarray:
     '''
     functionality:
         evolve the wave function psi under the potential V, kinetic operator T, and interaction erengy g|ψ|^2
@@ -38,10 +38,6 @@ def time_evolution(psi:cp.ndarray, U:cp.ndarray, V_sqrt:cp.ndarray, T:cp.ndarray
         psi: evolved wave function, shape (Nx, Ny)
     '''
     loss = 1 - 0.4j if imaginary_time else 1
-    # interacting strength #
-    g = (4*cp.pi*Num * hbar**2 * a*ab / m / e0 / x0**3
-         ) * cp.sqrt(m*omega_z/2/cp.pi/hbar * x0
-                     ) # correction for squeezing a 3D wavepacket (along z direction) into a x0 μm layer
 
     if g == 0:
         psi = psi * V_sqrt

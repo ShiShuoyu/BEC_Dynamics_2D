@@ -29,10 +29,15 @@ def main():
         json.dump(constants, f, indent=4, ensure_ascii=False)
 
     # Time dimensionless
-    from constants import t0
+    from constants import t0, hbar, m, x0, e0, a, ab
     args.omega_trap = args.omega_trap / t0
     args.omega_bec = args.omega_bec / t0
     args.omega_trap_z = args.omega_trap_z / t0
+
+  # interacting strength #
+    g = (4*cp.pi*args.atom_number * hbar**2 * a*ab / m / e0 / x0**3
+         ) * cp.sqrt(m*args.omega_trap_z/2/cp.pi/hbar * x0
+                     ) # correction for squeezing a 3D wavepacket (along z direction) into a x0 μm layer
 
     # Generate the time structure
     (dt, duration, n_steps, n_samples) = ev.time_step(dt=args.dt, duration=args.duration, sampling_interval=args.sampling_interval)
@@ -84,7 +89,7 @@ def main():
                     writer.grab_frame()
 
                 # Evolve the wavefunction
-                psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+                psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, g=g, imaginary_time=args.imaginary_time)
                 time = time + dt*t0 # physical time
     elif args.mechanics:
         for step in tqdm(range(n_steps)):
@@ -116,6 +121,7 @@ def main():
         print('\nsaving figures ...')
         # density profile
         draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/density_t{time:.0f}ms.png')
+        draw.camera(psi=cp.real(psi), X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/real_t{time:.0f}ms.png')
 
         # flow field
         psi1 = mc.wo_COM(psi=psi, X=X, Y=Y, Kx=Kx, Ky=Ky, dx=dx, dy=dy)
@@ -130,6 +136,9 @@ def main():
         draw.quantity(time=time_list, quantity=Lz_sr_list, xlabel='time (ms)', ylabel='Lz_sr (kg*μm^2/ms)', title='Intrinsic angular momentum', fontsize=16, file_name='output/Lz_sr.png')
         draw.quantity(time=time_list, quantity=omega_tot_list, xlabel='time (ms)', ylabel='omega_tot (ms^-1)', title='Total angular velocity', fontsize=16, file_name='output/omega_tot.png')
         draw.quantity(time=time_list, quantity=omega_sr_list, xlabel='time (ms)', ylabel='omega_sr (ms^-1)', title='Intrinsic angular velocity', fontsize=16, file_name='output/omega_sr.png')
+
+        mc.save_quantities(time_list=time_list, Iz_tot_list=Iz_tot_list, Iz_sr_list=Iz_sr_list,
+                           Lz_tot_list=Lz_tot_list, Lz_sr_list=Lz_sr_list, omega_sr_list=omega_sr_list, omega_tot_list=omega_tot_list)
     
     print('\ndone!')
     return
