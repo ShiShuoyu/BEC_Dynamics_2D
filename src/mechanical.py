@@ -133,14 +133,36 @@ def eigenaxis_angle(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray,
         X: x coordinates meshgrid, shape (Ny, Nx) # μm
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
     output:
-        ang_l: the polar angle of the eigenaxis whose eigenvalue is larger # rad
-        ang_s: the polar angle of the eigenaxis whose eigenvalue is smaller # rad
+        ang_c: the polar angle of the COM # rad (-pi, pi]
+        ang_l: the polar angle of the eigenaxis whose eigenvalue is larger # rad (-pi, pi]
+        ang_s: the polar angle of the eigenaxis whose eigenvalue is smaller # rad (-pi, pi]
     '''
-    ...
+    (Cx, Cy) = COM(psi, X, Y)
+    Cx = cp.asnumpy(Cx)
+    Cy = cp.asnumpy(Cy)
+    psi = cp.asnumpy(psi)
+    X = cp.asnumpy(X)
+    Y = cp.asnumpy(Y)
+    I = np.array([np.sum(np.abs(psi)**2 * (X-Cx)**2), 
+        np.sum(np.abs(psi)**2 * (X-Cx)*(Y-Cy)), 
+        np.sum(np.abs(psi)**2 * (X-Cx)*(Y-Cy)), 
+        np.sum(np.abs(psi)**2 * (Y-Cy)**2)])
+    eigVal, eigVec = np.linalg.eig(I.reshape(2,2))
+    idx_large = np.argmax(eigVal) # find the indice of the larger eigenvalue
+    idx_small = np.argmin(eigVal) # find the indice of the smaller eigenvalue
+    if Cx*eigVec[0,idx_large] + Cy*eigVec[1,idx_large] < 0:
+        eigVec[:,idx_large] = -eigVec[:,idx_large]
+    if Cx*eigVec[0,idx_small] + Cy*eigVec[1,idx_small] < 0:
+        eigVec[:,idx_small] = -eigVec[:,idx_small]
+    ang_c = np.arctan2(Cy, Cx) # the polar angle of the COM # rad (-pi, pi]
+    ang_l = np.arctan2(eigVec[1,idx_large], eigVec[0,idx_large]) # the polar angle of the eigenaxis whose eigenvalue is larger # rad (-pi, pi]
+    ang_s = np.arctan2(eigVec[1,idx_small], eigVec[0,idx_small]) # the polar angle of the eigenaxis whose eigenvalue is smaller # rad (-pi, pi]
+    return (ang_c, ang_l, ang_s)
 
 def save_quantities(time_list:list, Iz_tot_list:list, Iz_sr_list:list, 
                     Lz_tot_list:list, Lz_sr_list:list, omega_tot_list:list, 
-                    omega_sr_list:list) -> None:
+                    omega_sr_list:list, ang_c_list:list, ang_l_list:list, 
+                    ang_s_list:list) -> None:
     np.save('output/time.npy', time_list)
     np.save('output/Iz_tot.npy', Iz_tot_list)
     np.save('output/Iz_sr.npy', Iz_sr_list)
@@ -148,3 +170,6 @@ def save_quantities(time_list:list, Iz_tot_list:list, Iz_sr_list:list,
     np.save('output/Lz_sr.npy', Lz_sr_list)
     np.save('output/omega_tot.npy', omega_tot_list)
     np.save('output/omega_sr.npy', omega_sr_list)
+    np.save('output/ang_c.npy', ang_c_list)
+    np.save('output/ang_l.npy', ang_l_list)
+    np.save('output/ang_s.npy', ang_s_list)

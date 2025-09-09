@@ -67,6 +67,7 @@ conda activate env_bec
 2. try examples
 ```Terminal
 cd src
+mkdir output
 python main.py --help
 python main.py --video
 ```

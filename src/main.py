@@ -63,6 +63,9 @@ def main():
     Lz_sr_list = cp.zeros(n_samples, dtype=cp.float32)
     omega_tot_list = cp.zeros(n_samples, dtype=cp.float32)
     omega_sr_list = cp.zeros(n_samples, dtype=cp.float32)
+    ang_c_list = cp.zeros(n_samples, dtype=cp.float32)
+    ang_l_list = cp.zeros(n_samples, dtype=cp.float32)
+    ang_s_list = cp.zeros(n_samples, dtype=cp.float32)
 
     if args.video and args.mechanics:
         print("Error: --video and --mechanics cannot be set at the same time.")
@@ -100,6 +103,7 @@ def main():
                 Iz_sr = mc.Iz_c(psi=psi, X=X, Y=Y, dx=dx, dy=dy, Num=args.atom_number)
                 (Fx,Fy,Fx1,Fy1) = mc.flow_field(psi=psi, psi1 = psi1, Kx=Kx, Ky=Ky)
                 (Lz_tot, Lz_sr, omega_tot, omega_sr) = mc.rotate(Fx=Fx, Fy=Fy, Fx1=Fx1, Fy1=Fy1, dx=dx, dy=dy, X=X, Y=Y, Num=args.atom_number, Iz_tot=Iz_tot, Iz_sr=Iz_sr)
+                (ang_c, ang_l, ang_s) = mc.eigenaxis_angle(psi=psi, X=X, Y=Y)
                 # Store the mechanical quantities
                 time_list[idx_sampling] = time
                 Iz_tot_list[idx_sampling] = Iz_tot
@@ -108,14 +112,17 @@ def main():
                 Lz_sr_list[idx_sampling] = Lz_sr
                 omega_tot_list[idx_sampling] = omega_tot
                 omega_sr_list[idx_sampling] = omega_sr
+                ang_c_list[idx_sampling] = ang_c
+                ang_l_list[idx_sampling] = ang_l
+                ang_s_list[idx_sampling] = ang_s
                 idx_sampling = idx_sampling + 1
             # Evolve the wavefunction
-            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, g=g, imaginary_time=args.imaginary_time)
             time = time + dt*t0
     else:
         for step in tqdm(range(n_steps)):
             # Evolve the wavefunction
-            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, Num=args.atom_number, omega_z=args.omega_trap_z, imaginary_time=args.imaginary_time)
+            psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, g=g, imaginary_time=args.imaginary_time)
             time = time + dt*t0
     if args.figure: # output the density profile and flow field of the final state
         print('\nsaving figures ...')
@@ -136,10 +143,11 @@ def main():
         draw.quantity(time=time_list, quantity=Lz_sr_list, xlabel='time (ms)', ylabel='Lz_sr (kg*μm^2/ms)', title='Intrinsic angular momentum', fontsize=16, file_name='output/Lz_sr.png')
         draw.quantity(time=time_list, quantity=omega_tot_list, xlabel='time (ms)', ylabel='omega_tot (ms^-1)', title='Total angular velocity', fontsize=16, file_name='output/omega_tot.png')
         draw.quantity(time=time_list, quantity=omega_sr_list, xlabel='time (ms)', ylabel='omega_sr (ms^-1)', title='Intrinsic angular velocity', fontsize=16, file_name='output/omega_sr.png')
+        draw.quantity(time=time_list, quantity=ang_c_list, xlabel='time (ms)', ylabel='ang_com (rad)', title='Polar angle of COM', fontsize=16, file_name='output/ang_com.png')
+        draw.quantity(time=time_list, quantity=ang_l_list, xlabel='time (ms)', ylabel='ang_major (rad)', title='Polar angle of major axis', fontsize=16, file_name='output/ang_l.png')
+        draw.quantity(time=time_list, quantity=ang_s_list, xlabel='time (ms)', ylabel='ang_minor (rad)', title='Polar angle of minor axis', fontsize=16, file_name='output/ang_s.png')
 
-        mc.save_quantities(time_list=time_list, Iz_tot_list=Iz_tot_list, Iz_sr_list=Iz_sr_list,
-                           Lz_tot_list=Lz_tot_list, Lz_sr_list=Lz_sr_list, omega_sr_list=omega_sr_list, omega_tot_list=omega_tot_list)
-    
+        mc.save_quantities(time_list=time_list, Iz_tot_list=Iz_tot_list, Iz_sr_list=Iz_sr_list, Lz_tot_list=Lz_tot_list, Lz_sr_list=Lz_sr_list, omega_sr_list=omega_sr_list, omega_tot_list=omega_tot_list, ang_c_list=ang_c_list, ang_l_list=ang_l_list, ang_s_list=ang_s_list)
     print('\ndone!')
     return
 
