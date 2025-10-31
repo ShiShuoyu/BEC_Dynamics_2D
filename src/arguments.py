@@ -42,6 +42,8 @@ def input_args() -> ArgumentParser:
                         help='Center of the BEC in μm (e.g. ''25, 25'' means the center is at (25, 25) μm, and r_0 will be set to sqrt(2)*25 μm)')
     parser.add_argument('--omega_bec', type=cp.float32, default=0.01*np.pi, 
                         help='The frequency of the harmonic trap whose ground state is this gaussian wavepacket')
+    parser.add_argument('--angular_momentum_bec', type=cp.int32, nargs=2, default=(0, 0),
+                        help='The angular momentum eigenstate (l, m) (e.g. ''(2, 1)'' means l = 2, m = 1)')
     parser.add_argument('--imaginary_time', action='store_true', 
                         help='If set, perform imaginary time evolution')
     parser.add_argument('--velocity', type=cp.float32, nargs=2, default=(0, 3*cp.pi/10),
@@ -81,6 +83,7 @@ def display_args(parser:ArgumentParser) -> None:
     print(f"center of the BEC: ({parser.center_bec[0]}, {parser.center_bec[1]}) μm")
     print(f"trapping frequency of BEC ω_BEC: {parser.omega_bec} ms^-1")
     print(f"initial velocity: ({parser.velocity[0]}, {parser.velocity[1]}) μm/ms")
+    print(f"initial angular momentum eigenstate (l, m): ({parser.angular_momentum_bec[0]}, {parser.angular_momentum_bec[1]})")
     print("\n## overall simulation settings ##")
     print(f"imaginary time evolution: {'on' if parser.imaginary_time else 'off'}")
     print(f"video record: {'on' if parser.video else 'off'}")

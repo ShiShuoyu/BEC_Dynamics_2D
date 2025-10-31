@@ -88,7 +88,7 @@ def Norm(psi:cp.ndarray, dx:cp.float32, dy:cp.float32) -> cp.float32:
     return cp.sum(cp.abs(psi)**2) * (dx*dy)
 
 def wf_Gaussian(X:cp.ndarray, Y:cp.ndarray, BEC_center:cp.ndarray, omega:cp.float32, 
-                dx:cp.float32, dy:cp.float32) -> cp.ndarray:
+                l:cp.int32, lz:cp.int32, dx:cp.float32, dy:cp.float32) -> cp.ndarray:
     '''
     functionality:
         generate a Gaussian wavefunction for the BEC
@@ -97,16 +97,20 @@ def wf_Gaussian(X:cp.ndarray, Y:cp.ndarray, BEC_center:cp.ndarray, omega:cp.floa
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         BEC_center: center of the BEC, shape (2,) # μm
         omega: the frequency of the harmonic trap whose ground state is this gaussian wavepacket # ms^-1
+        l: total orbital angular momentum quantum number (L^2 = l(l+1)hbar^2)
+        lz: magnetic quantum number (L_z = lz*hbar)
         dx: grid spacing in x direction # μm
         dy: grid spacing in y direction # μm
     output:
         psi: wavefunction, shape (Ny, Nx) # normalized
     '''
+    if l < 0 or lz < -l or lz > l:
+        raise ValueError("Invalid angular momentum quantum numbers: l must be >= 0, m must be in [0, l]")
     psi = cp.asarray(
         np.exp(
             -(m*omega/2/hbar) * ((X-BEC_center[0])**2 + (Y-BEC_center[1])**2)
-            ), dtype=cp.complex64
-                    )
+            ) * (((X-BEC_center[0]) + 1j*(Y-BEC_center[1])) / np.sqrt((X-BEC_center[0])**2 + (Y-BEC_center[1])**2))**lz * ((X-BEC_center[0])**2 + (Y-BEC_center[1])**2) ** (l/2)
+            , dtype=cp.complex64)
     return psi / cp.sqrt(Norm(psi, dx, dy))
 
 def wf_ThomasFermi():

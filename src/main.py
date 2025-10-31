@@ -34,7 +34,7 @@ def main():
     args.omega_bec = args.omega_bec / t0
     args.omega_trap_z = args.omega_trap_z / t0
 
-  # interacting strength #
+    # interacting strength #
     g = (4*cp.pi*args.atom_number * hbar**2 * a*ab / m / e0 / x0**3
          ) * cp.sqrt(m*args.omega_trap_z/2/cp.pi/hbar * x0
                      ) # correction for squeezing a 3D wavepacket (along z direction) into a x0 μm layer
@@ -49,7 +49,7 @@ def main():
     (U, V_sqrt, T) = wf.operator(X=X, Y=Y, Kx=Kx, Ky=Ky, omega=args.omega_trap,
                                  trap_center=np.array(args.center_trap), beta=args.beta, 
                                  r_0=args.r_0, imaginary_time=args.imaginary_time, dt=args.dt)
-    psi = wf.wf_Gaussian(X=X, Y=Y, BEC_center=np.array(args.center_bec), omega=args.omega_bec, dx=dx, dy=dy)
+    psi = wf.wf_Gaussian(X=X, Y=Y, BEC_center=np.array(args.center_bec), omega=args.omega_bec, l=args.angular_momentum_bec[0], lz=args.angular_momentum_bec[1], dx=dx, dy=dy)
     psi = wf.boost(psi=psi, X=X, Y=Y, vx=args.velocity[0], vy=args.velocity[1])
 
     # Prepare the output arrays
@@ -149,7 +149,7 @@ def main():
         draw.quantity(time=time_list, quantity=ang_s_list, xlabel='time (ms)', ylabel='ang_minor (rad)', title='Polar angle of minor axis', fontsize=16, file_name='output/ang_s.png')
 
         mc.save_quantities(time_list=time_list, Iz_tot_list=Iz_tot_list, Iz_sr_list=Iz_sr_list, Lz_tot_list=Lz_tot_list, Lz_sr_list=Lz_sr_list, omega_sr_list=omega_sr_list, omega_tot_list=omega_tot_list, ang_c_list=ang_c_list, ang_l_list=ang_l_list, ang_s_list=ang_s_list)
-    print('\ndone!')
+    print('\nDONE!')
     return
 
 if __name__ == "__main__":
