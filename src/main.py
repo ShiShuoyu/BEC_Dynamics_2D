@@ -88,7 +88,7 @@ def main():
                 # Sample the wavefunction
                 if step % (args.sampling_interval) == 0:
                     # Store the wavefunction for visualization
-                    draw.camera_video(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16)
+                    draw.camera_video(Z=(cp.abs(psi)**2)*(args.atom_number), X=X, Y=Y, colormap='plasma', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16)
                     writer.grab_frame()
 
                 # Evolve the wavefunction
@@ -127,8 +127,9 @@ def main():
     if args.figure: # output the density profile and flow field of the final state
         print('\nsaving figures ...')
         # density profile
-        draw.camera(psi=psi, X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/density_t{time:.0f}ms.png')
-        draw.camera(psi=cp.real(psi), X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/real_t{time:.0f}ms.png')
+        draw.camera(Z=(cp.abs(psi)**2)*(args.atom_number), X=X, Y=Y, colormap='plasma', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/density_t{time:.0f}ms.png')
+        draw.camera(Z=(cp.real(psi)**2)*(args.atom_number), X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/real_t{time:.0f}ms.png')
+        draw.camera(Z=cp.angle(psi), X=X, Y=Y, colormap='viridis', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/phase_t{time:.0f}ms.png')
 
         # flow field
         psi1 = mc.wo_COM(psi=psi, X=X, Y=Y, Kx=Kx, Ky=Ky, dx=dx, dy=dy)

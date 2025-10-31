@@ -3,13 +3,13 @@ import cupy as cp
 import matplotlib.pyplot as plt
 from skimage.measure import block_reduce
 
-def camera_video(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str, 
+def camera_video(Z:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str, 
            xlabel:str, ylabel:str, title:str, fontsize:float) -> None:
     '''
     functionality:
         plot the density distribution of the wavepacket for video
     input:
-        psi: wavefunction, shape (Ny, Nx)
+        Z: density distribution or anything else, MUST BE REAL, shape (Ny, Nx)
         X: x coordinates meshgrid, shape (Ny, Nx) # μm
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         colormap: colormap for the density plot
@@ -22,7 +22,7 @@ def camera_video(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
     xmax = cp.asnumpy(cp.max(X))
     ymin = cp.asnumpy(cp.min(Y))
     ymax = cp.asnumpy(cp.max(Y))
-    plt.imshow(cp.asnumpy(cp.abs(psi)**2), extent=(xmin,xmax,ymin,ymax), cmap=colormap)
+    plt.imshow(cp.asnumpy(Z), extent=(xmin,xmax,ymin,ymax), cmap=colormap)
     
     ax = plt.gca()
     ax.set_xlim(xmin, xmax)
@@ -34,13 +34,13 @@ def camera_video(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
 
     return
 
-def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str, 
+def camera(Z:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str, 
            xlabel:str, ylabel:str, title:str, fontsize:float, file_name:str) -> None:
     '''
     functionality:
         plot the density distribution of the wavepacket
     input:
-        psi: wavefunction, shape (Ny, Nx)
+        Z: density distribution or anything else, MUST BE REAL, shape (Ny, Nx)
         X: x coordinates meshgrid, shape (Ny, Nx) # μm
         Y: y coordinates meshgrid, shape (Ny, Nx) # μm
         colormap: colormap for the density plot
@@ -54,7 +54,7 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
     xmax = cp.asnumpy(cp.max(X))
     ymin = cp.asnumpy(cp.min(Y))
     ymax = cp.asnumpy(cp.max(Y))
-    plt.imshow(cp.asnumpy(cp.abs(psi)**2), extent=(xmin,xmax,ymin,ymax), cmap=colormap)
+    plt.imshow(cp.asnumpy(Z), extent=(xmin,xmax,ymin,ymax), cmap=colormap)
     
     ax = plt.gca()
     ax.set_xlim(xmin, xmax)
@@ -63,6 +63,7 @@ def camera(psi:cp.ndarray, X:cp.ndarray, Y:cp.ndarray, colormap:str,
     ax.set_ylabel(ylabel, fontsize=fontsize)
     ax.set_title(title, fontsize=fontsize)
     ax.set_aspect('equal')
+    plt.colorbar()
 
     plt.savefig(file_name, dpi=600)
     plt.clf()
