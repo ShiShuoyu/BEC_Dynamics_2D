@@ -4,3 +4,4 @@ src/*.mp4
 src/*.png
 src/__pycache__/
 src/output/
+.github/
