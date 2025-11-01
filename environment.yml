@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.13.5
+  - python=3.13.9
   - numpy=2.3.1
   - matplotlib=3.10.0
   - ffmpeg=4.3.1
@@ -11,3 +11,4 @@ dependencies:
   - argparse=1.4.0
   - tqdm=4.67.1
   - scikit-image=0.25.2
+  - ipykernel=7.1.0

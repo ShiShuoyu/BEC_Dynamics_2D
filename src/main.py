@@ -40,7 +40,7 @@ def main():
                      ) # correction for squeezing a 3D wavepacket (along z direction) into a x0 μm layer
 
     # Generate the time structure
-    (dt, duration, n_steps, n_samples) = ev.time_step(dt=args.dt, duration=args.duration, sampling_interval=args.sampling_interval)
+    (duration, n_steps, n_samples) = ev.time_step(dt=args.dt, duration=args.duration, sampling_interval=args.sampling_interval)
 
     # Generate the grid, operators, and initial wavefunction
     (X, Y, Kx, Ky, dx, dy) = wf.grid(x_range=(-args.radius_xy[0], args.radius_xy[0]),
@@ -93,7 +93,7 @@ def main():
 
                 # Evolve the wavefunction
                 psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, g=g, imaginary_time=args.imaginary_time)
-                time = time + dt*t0 # physical time
+                time = time + args.dt # physical time
     elif args.mechanics:
         for step in tqdm(range(n_steps)):
             if step % (args.sampling_interval) == 0:
@@ -118,12 +118,12 @@ def main():
                 idx_sampling = idx_sampling + 1
             # Evolve the wavefunction
             psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, g=g, imaginary_time=args.imaginary_time)
-            time = time + dt*t0
+            time = time + args.dt
     else:
         for step in tqdm(range(n_steps)):
             # Evolve the wavefunction
             psi = ev.time_evolution(psi=psi, U=U, V_sqrt=V_sqrt, T=T, dt=args.dt, g=g, imaginary_time=args.imaginary_time)
-            time = time + dt*t0
+            time = time + args.dt
     if args.figure: # output the density profile and flow field of the final state
         print('\nsaving figures ...')
         # density profile
