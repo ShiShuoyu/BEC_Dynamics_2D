@@ -84,6 +84,18 @@
             }
         }
         
+        .param-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two-column layout */
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .param-grid {
+                grid-template-columns: 1fr; /* Single column on small screens */
+            }
+        }
+        
         .section-title {
             font-size: 1.5rem;
             color: var(--primary-color);
@@ -122,11 +134,12 @@
         
         .param-input {
             flex: 1;
-            min-width: 200px;
-            padding: 8px 12px;
+            min-width: 120px; /* Shorter width */
+            max-width: 150px; /* Limit max width */
+            padding: 6px 8px; /* Smaller padding */
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 0.9rem; /* Smaller font */
         }
         
         .param-input:focus {
@@ -300,141 +313,143 @@
             <div class="parameters-section">
                 <h2 class="section-title">Simulation Parameters</h2>
                 
-                <!-- Atomic Parameters -->
-                <div class="parameter-group">
-                    <h3 class="group-title">Atomic Parameters</h3>
-                    <div class="param-row">
-                        <label class="param-label">Relative Atomic Mass (amu):</label>
-                        <input type="number" id="relative_atomic_mass" class="param-input" value="87">
+                <div class="param-grid">
+                    <!-- Atomic Parameters -->
+                    <div class="parameter-group">
+                        <h3 class="group-title">Atomic Parameters</h3>
+                        <div class="param-row">
+                            <label class="param-label">Relative Atomic Mass (amu):</label>
+                            <input type="number" id="relative_atomic_mass" class="param-input" value="87">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Scattering Length (a_Bohr):</label>
+                            <input type="number" id="scattering_length" class="param-input" value="-10.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Atom Number:</label>
+                            <input type="number" id="atom_number" class="param-input" value="2500">
+                        </div>
                     </div>
-                    <div class="param-row">
-                        <label class="param-label">Scattering Length (a_Bohr):</label>
-                        <input type="number" id="scattering_length" class="param-input" value="-10.0">
+                    
+                    <!-- Time Structure -->
+                    <div class="parameter-group">
+                        <h3 class="group-title">Time Structure</h3>
+                        <div class="param-row">
+                            <label class="param-label">Duration (ms):</label>
+                            <input type="number" id="duration" class="param-input" value="200.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Time Step (ms):</label>
+                            <input type="number" id="dt" class="param-input" value="0.5" step="0.01">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Sampling Interval:</label>
+                            <input type="number" id="sampling_interval" class="param-input" value="10">
+                        </div>
                     </div>
-                    <div class="param-row">
-                        <label class="param-label">Atom Number:</label>
-                        <input type="number" id="atom_number" class="param-input" value="2500">
+                    
+                    <!-- Grid Structure -->
+                    <div class="parameter-group">
+                        <h3 class="group-title">Grid Structure</h3>
+                        <div class="param-row">
+                            <label class="param-label">Radius X (μm):</label>
+                            <input type="number" id="radius_x" class="param-input" value="50">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Radius Y (μm):</label>
+                            <input type="number" id="radius_y" class="param-input" value="50">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Number X:</label>
+                            <input type="number" id="number_x" class="param-input" value="256">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Number Y:</label>
+                            <input type="number" id="number_y" class="param-input" value="256">
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Time Structure -->
-                <div class="parameter-group">
-                    <h3 class="group-title">Time Structure</h3>
-                    <div class="param-row">
-                        <label class="param-label">Duration (ms):</label>
-                        <input type="number" id="duration" class="param-input" value="200.0">
+                    
+                    <!-- Potential Trap -->
+                    <div class="parameter-group">
+                        <h3 class="group-title">Potential Trap</h3>
+                        <div class="param-row">
+                            <label class="param-label">Trap Frequency ω (ms⁻¹):</label>
+                            <input type="number" id="omega_trap" class="param-input" value="0.03142">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Center X (μm):</label>
+                            <input type="number" id="center_trap_x" class="param-input" value="0.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Center Y (μm):</label>
+                            <input type="number" id="center_trap_y" class="param-input" value="0.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Anharmonic Parameter β:</label>
+                            <input type="number" id="beta" class="param-input" value="-0.1">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Length Scale r₀ (μm):</label>
+                            <input type="number" id="r_0" class="param-input" value="30.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Trap Frequency ω_z (ms⁻¹):</label>
+                            <input type="number" id="omega_trap_z" class="param-input" value="0.01571">
+                        </div>
                     </div>
-                    <div class="param-row">
-                        <label class="param-label">Time Step (ms):</label>
-                        <input type="number" id="dt" class="param-input" value="0.5" step="0.01">
+                    
+                    <!-- Initial Wavepacket -->
+                    <div class="parameter-group">
+                        <h3 class="group-title">Initial Wavepacket</h3>
+                        <div class="param-row">
+                            <label class="param-label">BEC Center X (μm):</label>
+                            <input type="number" id="center_bec_x" class="param-input" value="30.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">BEC Center Y (μm):</label>
+                            <input type="number" id="center_bec_y" class="param-input" value="0.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">BEC Frequency ω_BEC (ms⁻¹):</label>
+                            <input type="number" id="omega_bec" class="param-input" value="0.03142">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Velocity X (μm/ms):</label>
+                            <input type="number" id="velocity_x" class="param-input" value="0.0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Velocity Y (μm/ms):</label>
+                            <input type="number" id="velocity_y" class="param-input" value="0.94248">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Angular Momentum l:</label>
+                            <input type="number" id="angular_momentum_l" class="param-input" value="0">
+                        </div>
+                        <div class="param-row">
+                            <label class="param-label">Angular Momentum m:</label>
+                            <input type="number" id="angular_momentum_m" class="param-input" value="0">
+                        </div>
                     </div>
-                    <div class="param-row">
-                        <label class="param-label">Sampling Interval:</label>
-                        <input type="number" id="sampling_interval" class="param-input" value="10">
-                    </div>
-                </div>
-                
-                <!-- Grid Structure -->
-                <div class="parameter-group">
-                    <h3 class="group-title">Grid Structure</h3>
-                    <div class="param-row">
-                        <label class="param-label">Radius X (μm):</label>
-                        <input type="number" id="radius_x" class="param-input" value="50">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Radius Y (μm):</label>
-                        <input type="number" id="radius_y" class="param-input" value="50">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Number X:</label>
-                        <input type="number" id="number_x" class="param-input" value="256">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Number Y:</label>
-                        <input type="number" id="number_y" class="param-input" value="256">
-                    </div>
-                </div>
-                
-                <!-- Potential Trap -->
-                <div class="parameter-group">
-                    <h3 class="group-title">Potential Trap</h3>
-                    <div class="param-row">
-                        <label class="param-label">Trap Frequency ω (ms⁻¹):</label>
-                        <input type="number" id="omega_trap" class="param-input" value="0.031415926535897934">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Center X (μm):</label>
-                        <input type="number" id="center_trap_x" class="param-input" value="0.0">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Center Y (μm):</label>
-                        <input type="number" id="center_trap_y" class="param-input" value="0.0">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Anharmonic Parameter β:</label>
-                        <input type="number" id="beta" class="param-input" value="-0.1">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Length Scale r₀ (μm):</label>
-                        <input type="number" id="r_0" class="param-input" value="30.0">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Trap Frequency ω_z (ms⁻¹):</label>
-                        <input type="number" id="omega_trap_z" class="param-input" value="0.015707963267948967">
-                    </div>
-                </div>
-                
-                <!-- Initial Wavepacket -->
-                <div class="parameter-group">
-                    <h3 class="group-title">Initial Wavepacket</h3>
-                    <div class="param-row">
-                        <label class="param-label">BEC Center X (μm):</label>
-                        <input type="number" id="center_bec_x" class="param-input" value="30.0">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">BEC Center Y (μm):</label>
-                        <input type="number" id="center_bec_y" class="param-input" value="0.0">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">BEC Frequency ω_BEC (ms⁻¹):</label>
-                        <input type="number" id="omega_bec" class="param-input" value="0.031415926535897934">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Velocity X (μm/ms):</label>
-                        <input type="number" id="velocity_x" class="param-input" value="0.0">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Velocity Y (μm/ms):</label>
-                        <input type="number" id="velocity_y" class="param-input" value="0.9424777960769379">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Angular Momentum l:</label>
-                        <input type="number" id="angular_momentum_l" class="param-input" value="0">
-                    </div>
-                    <div class="param-row">
-                        <label class="param-label">Angular Momentum m:</label>
-                        <input type="number" id="angular_momentum_m" class="param-input" value="0">
-                    </div>
-                </div>
-                
-                <!-- Simulation Settings -->
-                <div class="parameter-group">
-                    <h3 class="group-title">Simulation Settings</h3>
-                    <div class="param-row">
-                        <input type="checkbox" id="imaginary_time" class="checkbox-input">
-                        <label for="imaginary_time">Imaginary Time Evolution</label>
-                    </div>
-                    <div class="param-row">
-                        <input type="checkbox" id="video" class="checkbox-input">
-                        <label for="video">Save as Video</label>
-                    </div>
-                    <div class="param-row">
-                        <input type="checkbox" id="mechanics" class="checkbox-input">
-                        <label for="mechanics">Save Mechanical Quantities</label>
-                    </div>
-                    <div class="param-row">
-                        <input type="checkbox" id="figure" class="checkbox-input">
-                        <label for="figure">Save as Figure</label>
+                    
+                    <!-- Simulation Settings -->
+                    <div class="parameter-group">
+                        <h3 class="group-title">Simulation Settings</h3>
+                        <div class="param-row">
+                            <input type="checkbox" id="imaginary_time" class="checkbox-input">
+                            <label for="imaginary_time">Imaginary Time Evolution</label>
+                        </div>
+                        <div class="param-row">
+                            <input type="checkbox" id="video" class="checkbox-input">
+                            <label for="video">Save as Video</label>
+                        </div>
+                        <div class="param-row">
+                            <input type="checkbox" id="mechanics" class="checkbox-input">
+                            <label for="mechanics">Save Mechanical Quantities</label>
+                        </div>
+                        <div class="param-row">
+                            <input type="checkbox" id="figure" class="checkbox-input">
+                            <label for="figure">Save as Figure</label>
+                        </div>
                     </div>
                 </div>
                 
@@ -473,11 +488,7 @@
                     
                     <div id="imageControls" class="hidden">
                         <h3>Image Controls</h3>
-                        <div class="param-row">
-                            <button id="zoomInBtn" class="btn btn-primary">Zoom In</button>
-                            <button id="zoomOutBtn" class="btn btn-primary">Zoom Out</button>
-                            <button id="resetZoomBtn" class="btn btn-warning">Reset Zoom</button>
-                        </div>
+                        <!-- Browser native zoom (Ctrl + scroll) recommended -->
                     </div>
                 </div>
             </div>
@@ -541,35 +552,46 @@
             }
         }
         
-        // Populate form fields with default values
+        // Helper function to format numbers to 5 significant digits
+        function formatToSigFigs(value, sigFigs = 5) {
+            if (typeof value !== 'number') return value;
+            if (value === 0) return 0;
+            if (Math.abs(value) < 1e-10 && Math.abs(value) > 0) {
+                // Handle very small numbers with appropriate precision
+                return parseFloat(value.toPrecision(sigFigs));
+            }
+            return parseFloat(Number(value).toPrecision(sigFigs));
+        }
+
+        // Populate form fields with default values (limited to 5 significant digits)
         function populateFormWithDefaults() {
             if (Object.keys(defaults).length === 0) return;
             
             document.getElementById('relative_atomic_mass').value = defaults.atomic_parameters.relative_atomic_mass;
-            document.getElementById('scattering_length').value = defaults.atomic_parameters.scattering_length;
+            document.getElementById('scattering_length').value = formatToSigFigs(defaults.atomic_parameters.scattering_length);
             document.getElementById('atom_number').value = defaults.atomic_parameters.atom_number;
             
-            document.getElementById('duration').value = defaults.time_structure.duration;
-            document.getElementById('dt').value = defaults.time_structure.dt;
+            document.getElementById('duration').value = formatToSigFigs(defaults.time_structure.duration);
+            document.getElementById('dt').value = formatToSigFigs(defaults.time_structure.dt);
             document.getElementById('sampling_interval').value = defaults.time_structure.sampling_interval;
             
-            document.getElementById('radius_x').value = defaults.grid_structure.radius_xy[0];
-            document.getElementById('radius_y').value = defaults.grid_structure.radius_xy[1];
+            document.getElementById('radius_x').value = formatToSigFigs(defaults.grid_structure.radius_xy[0]);
+            document.getElementById('radius_y').value = formatToSigFigs(defaults.grid_structure.radius_xy[1]);
             document.getElementById('number_x').value = defaults.grid_structure.number_xy[0];
             document.getElementById('number_y').value = defaults.grid_structure.number_xy[1];
             
-            document.getElementById('omega_trap').value = defaults.potential_trap.omega_trap;
-            document.getElementById('center_trap_x').value = defaults.potential_trap.center_trap[0];
-            document.getElementById('center_trap_y').value = defaults.potential_trap.center_trap[1];
-            document.getElementById('beta').value = defaults.potential_trap.beta;
-            document.getElementById('r_0').value = defaults.potential_trap.r_0;
-            document.getElementById('omega_trap_z').value = defaults.potential_trap.omega_trap_z;
+            document.getElementById('omega_trap').value = formatToSigFigs(defaults.potential_trap.omega_trap);
+            document.getElementById('center_trap_x').value = formatToSigFigs(defaults.potential_trap.center_trap[0]);
+            document.getElementById('center_trap_y').value = formatToSigFigs(defaults.potential_trap.center_trap[1]);
+            document.getElementById('beta').value = formatToSigFigs(defaults.potential_trap.beta);
+            document.getElementById('r_0').value = formatToSigFigs(defaults.potential_trap.r_0);
+            document.getElementById('omega_trap_z').value = formatToSigFigs(defaults.potential_trap.omega_trap_z);
             
-            document.getElementById('center_bec_x').value = defaults.initial_wavepacket.center_bec[0];
-            document.getElementById('center_bec_y').value = defaults.initial_wavepacket.center_bec[1];
-            document.getElementById('omega_bec').value = defaults.initial_wavepacket.omega_bec;
-            document.getElementById('velocity_x').value = defaults.initial_wavepacket.velocity[0];
-            document.getElementById('velocity_y').value = defaults.initial_wavepacket.velocity[1];
+            document.getElementById('center_bec_x').value = formatToSigFigs(defaults.initial_wavepacket.center_bec[0]);
+            document.getElementById('center_bec_y').value = formatToSigFigs(defaults.initial_wavepacket.center_bec[1]);
+            document.getElementById('omega_bec').value = formatToSigFigs(defaults.initial_wavepacket.omega_bec);
+            document.getElementById('velocity_x').value = formatToSigFigs(defaults.initial_wavepacket.velocity[0]);
+            document.getElementById('velocity_y').value = formatToSigFigs(defaults.initial_wavepacket.velocity[1]);
             document.getElementById('angular_momentum_l').value = defaults.initial_wavepacket.angular_momentum_bec[0];
             document.getElementById('angular_momentum_m').value = defaults.initial_wavepacket.angular_momentum_bec[1];
             
@@ -708,7 +730,8 @@
                     showProgress();
                     updateProgress(0, "Simulation started...");
                     
-                    // Poll for status updates
+                    // Poll for status updates (optimized to only update when new output is available)
+                    let lastLogLength = 0;
                     const statusInterval = setInterval(async () => {
                         try {
                             const statusResponse = await fetch('/api/simulation/status');
@@ -718,10 +741,14 @@
                                 // Update progress bar
                                 updateProgress(statusData.progress, statusData.status);
                                 
-                                // Update log with new messages
-                                statusData.log.forEach(logEntry => {
-                                    logMessage(logEntry);
-                                });
+                                // Only update log if there are new messages (terminal-like behavior)
+                                if (statusData.log.length > lastLogLength) {
+                                    const newLogEntries = statusData.log.slice(lastLogLength);
+                                    newLogEntries.forEach(logEntry => {
+                                        logMessage(logEntry);
+                                    });
+                                    lastLogLength = statusData.log.length;
+                                }
                                 
                                 // If simulation is complete, stop polling
                                 if (!statusData.running && statusData.status.includes("Completed")) {
@@ -742,7 +769,7 @@
                         } catch (error) {
                             logMessage("Error polling simulation status: " + error.message);
                         }
-                    }, 1000); // Update every second
+                    }, 1000); // Check every second, but only update UI when new data is available
                 } else {
                     throw new Error(`Server responded with status ${response.status}`);
                 }
@@ -859,25 +886,7 @@
                 }
             });
             
-            // Image controls
-            document.getElementById('zoomInBtn').addEventListener('click', function() {
-                const img = document.getElementById('resultImage');
-                const currentScale = parseFloat(img.style.transform.split('scale(')[1]) || 1;
-                img.style.transform = `scale(${currentScale * 1.1})`;
-                logMessage("Zoomed in");
-            });
-            
-            document.getElementById('zoomOutBtn').addEventListener('click', function() {
-                const img = document.getElementById('resultImage');
-                const currentScale = parseFloat(img.style.transform.split('scale(')[1]) || 1;
-                img.style.transform = `scale(${Math.max(0.1, currentScale * 0.9)})`;
-                logMessage("Zoomed out");
-            });
-            
-            document.getElementById('resetZoomBtn').addEventListener('click', function() {
-                document.getElementById('resultImage').style.transform = 'scale(1)';
-                logMessage("Zoom reset");
-            });
+            // Image controls - No zoom functionality (using browser native zoom)
         });
     </script>
 </body>
