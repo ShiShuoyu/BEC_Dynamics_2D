@@ -789,7 +789,9 @@
                         let imgToLoad = null;
                         
                         // Try to find density_final.png first
-                        const finalDensity = data.categorized.density.find(img => img.includes('final'));
+                        const finalDensity = data.categorized.density_final && data.categorized.density_final.length > 0 ? 
+                                            data.categorized.density_final[0] : 
+                                            data.categorized.density.find(img => img.includes('final'));
                         if (finalDensity) {
                             imgToLoad = finalDensity;
                         } else if (data.categorized.density.length > 0) {
@@ -843,7 +845,9 @@
                         const data = await response.json();
                         
                         // Look for final state image first, then fallback to any density image
-                        const finalDensity = data.categorized.density.find(img => img.includes('final'));
+                        const finalDensity = data.categorized.density_final && data.categorized.density_final.length > 0 ? 
+                                            data.categorized.density_final[0] : 
+                                            data.categorized.density.find(img => img.includes('final'));
                         if (finalDensity) {
                             document.getElementById('resultImage').src = `/results/${finalDensity}`;
                             logMessage(`Displaying density plot: ${finalDensity}`);
@@ -866,7 +870,9 @@
                         const data = await response.json();
                         
                         // Look for final state image first, then fallback to any phase image
-                        const finalPhase = data.categorized.phase.find(img => img.includes('final'));
+                        const finalPhase = data.categorized.phase_final && data.categorized.phase_final.length > 0 ? 
+                                          data.categorized.phase_final[0] : 
+                                          data.categorized.phase.find(img => img.includes('final'));
                         if (finalPhase) {
                             document.getElementById('resultImage').src = `/results/${finalPhase}`;
                             logMessage(`Displaying phase plot: ${finalPhase}`);
@@ -889,7 +895,9 @@
                         const data = await response.json();
                         
                         // Look for final state flow image first, then fallback
-                        const finalFlow = data.categorized.flow.find(img => img.includes('final'));
+                        const finalFlow = data.categorized.flow_final && data.categorized.flow_final.length > 0 ? 
+                                         data.categorized.flow_final[0] : 
+                                         data.categorized.flow.find(img => img.includes('final'));
                         if (finalFlow) {
                             document.getElementById('resultImage').src = `/results/${finalFlow}`;
                             logMessage(`Displaying flow field plot: ${finalFlow}`);
@@ -898,7 +906,9 @@
                             logMessage(`Displaying flow field plot: ${data.categorized.flow[0]}`);
                         } else if (data.categorized.real.length > 0) {
                             // If no flow images, show real component as alternative
-                            const finalReal = data.categorized.real.find(img => img.includes('final'));
+                            const finalReal = data.categorized.real_final && data.categorized.real_final.length > 0 ? 
+                                              data.categorized.real_final[0] : 
+                                              data.categorized.real.find(img => img.includes('final'));
                             if (finalReal) {
                                 document.getElementById('resultImage').src = `/results/${finalReal}`;
                                 logMessage(`Displaying real component plot: ${finalReal}`);
