@@ -6,3 +6,4 @@ src/__pycache__/
 src/output/
 src/output_old/
 .github/
+qwen.md
