@@ -30,4 +30,4 @@ simulation_settings:
   imaginary_time: false
   video: false
   mechanics: false
-  figure: false
+  figure: true  # Enable figure generation by default so results can be displayed

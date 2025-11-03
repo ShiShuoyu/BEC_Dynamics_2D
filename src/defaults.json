@@ -48,6 +48,6 @@
     "imaginary_time": false,
     "video": false,
     "mechanics": false,
-    "figure": false
+    "figure": true
   }
 }

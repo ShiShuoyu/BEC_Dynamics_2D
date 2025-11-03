@@ -29,6 +29,10 @@ def run_simulation_with_progress(params):
         src_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src')
         os.chdir(src_dir)
         
+        # Ensure output directory exists
+        output_dir = os.path.join(src_dir, 'output')
+        os.makedirs(output_dir, exist_ok=True)
+        
         # Activate conda environment and run the simulation
         # First, try to run the simulation using the current Python environment
         # In a real scenario, you might need to activate a specific conda environment

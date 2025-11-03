@@ -756,8 +756,11 @@
                                     hideProgress();
                                     logMessage("Simulation completed! Loading results...");
                                     
-                                    // Load available result images
-                                    loadResultImages();
+                                    // Add a small delay to ensure images are written to disk
+                                    setTimeout(() => {
+                                        // Load available result images
+                                        loadResultImages();
+                                    }, 1000); // Wait 1 second to ensure images are written
                                 } else if (!statusData.running && statusData.status.includes("Error")) {
                                     clearInterval(statusInterval);
                                     hideProgress();
