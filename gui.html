@@ -785,9 +785,14 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (data.images.length > 0) {
-                        // Show the first density image as a preview, or any image if no density images exist
+                        // Prioritize final state images, then fallback to any density image
                         let imgToLoad = null;
-                        if (data.categorized.density.length > 0) {
+                        
+                        // Try to find density_final.png first
+                        const finalDensity = data.categorized.density.find(img => img.includes('final'));
+                        if (finalDensity) {
+                            imgToLoad = finalDensity;
+                        } else if (data.categorized.density.length > 0) {
                             imgToLoad = data.categorized.density[0];
                         } else if (data.images.length > 0) {
                             imgToLoad = data.images[0];
@@ -830,13 +835,19 @@
                 runSimulation();
             });
             
-            // Image display buttons
+            // Image display buttons - prioritizing final state images with consistent names
             document.getElementById('showDensityBtn').addEventListener('click', async function() {
                 try {
                     const response = await fetch('/api/results/images');
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.categorized.density.length > 0) {
+                        
+                        // Look for final state image first, then fallback to any density image
+                        const finalDensity = data.categorized.density.find(img => img.includes('final'));
+                        if (finalDensity) {
+                            document.getElementById('resultImage').src = `/results/${finalDensity}`;
+                            logMessage(`Displaying density plot: ${finalDensity}`);
+                        } else if (data.categorized.density.length > 0) {
                             document.getElementById('resultImage').src = `/results/${data.categorized.density[0]}`;
                             logMessage(`Displaying density plot: ${data.categorized.density[0]}`);
                         } else {
@@ -853,7 +864,13 @@
                     const response = await fetch('/api/results/images');
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.categorized.phase.length > 0) {
+                        
+                        // Look for final state image first, then fallback to any phase image
+                        const finalPhase = data.categorized.phase.find(img => img.includes('final'));
+                        if (finalPhase) {
+                            document.getElementById('resultImage').src = `/results/${finalPhase}`;
+                            logMessage(`Displaying phase plot: ${finalPhase}`);
+                        } else if (data.categorized.phase.length > 0) {
                             document.getElementById('resultImage').src = `/results/${data.categorized.phase[0]}`;
                             logMessage(`Displaying phase plot: ${data.categorized.phase[0]}`);
                         } else {
@@ -870,13 +887,25 @@
                     const response = await fetch('/api/results/images');
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.categorized.flow.length > 0) {
+                        
+                        // Look for final state flow image first, then fallback
+                        const finalFlow = data.categorized.flow.find(img => img.includes('final'));
+                        if (finalFlow) {
+                            document.getElementById('resultImage').src = `/results/${finalFlow}`;
+                            logMessage(`Displaying flow field plot: ${finalFlow}`);
+                        } else if (data.categorized.flow.length > 0) {
                             document.getElementById('resultImage').src = `/results/${data.categorized.flow[0]}`;
                             logMessage(`Displaying flow field plot: ${data.categorized.flow[0]}`);
                         } else if (data.categorized.real.length > 0) {
                             // If no flow images, show real component as alternative
-                            document.getElementById('resultImage').src = `/results/${data.categorized.real[0]}`;
-                            logMessage(`Displaying real component plot: ${data.categorized.real[0]}`);
+                            const finalReal = data.categorized.real.find(img => img.includes('final'));
+                            if (finalReal) {
+                                document.getElementById('resultImage').src = `/results/${finalReal}`;
+                                logMessage(`Displaying real component plot: ${finalReal}`);
+                            } else {
+                                document.getElementById('resultImage').src = `/results/${data.categorized.real[0]}`;
+                                logMessage(`Displaying real component plot: ${data.categorized.real[0]}`);
+                            }
                         } else {
                             logMessage("No flow field or real component images found");
                         }

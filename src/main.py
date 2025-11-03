@@ -126,16 +126,24 @@ def main():
             time = time + dt*t0
     if args.figure: # output the density profile and flow field of the final state
         print('\nsaving figures ...')
-        # density profile
+        # density profile - save with both time-specific and consistent names
         draw.camera(Z=(cp.abs(psi)**2)*(args.atom_number), X=X, Y=Y, colormap='plasma', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/density_t{time:.0f}ms.png')
+        draw.camera(Z=(cp.abs(psi)**2)*(args.atom_number), X=X, Y=Y, colormap='plasma', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name='output/density_final.png')  # consistent name
+        
         draw.camera(Z=(cp.real(psi)**2)*(args.atom_number), X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/real_t{time:.0f}ms.png')
+        draw.camera(Z=(cp.real(psi)**2)*(args.atom_number), X=X, Y=Y, colormap='hot', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name='output/real_final.png')  # consistent name
+        
         draw.camera(Z=cp.angle(psi), X=X, Y=Y, colormap='viridis', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name=f'output/phase_t{time:.0f}ms.png')
+        draw.camera(Z=cp.angle(psi), X=X, Y=Y, colormap='viridis', xlabel='x (μm)', ylabel='y (μm)', title=f'time = {time:.2f}ms', fontsize=16, file_name='output/phase_final.png')  # consistent name
 
-        # flow field
+        # flow field - save with both time-specific and consistent names
         psi1 = mc.wo_COM(psi=psi, X=X, Y=Y, Kx=Kx, Ky=Ky, dx=dx, dy=dy)
         (Fx,Fy,Fx1,Fy1) = mc.flow_field(psi=psi, psi1=psi1, Kx=Kx, Ky=Ky)
         draw.flow(Fx=Fx, Fy=Fy, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'output/flow_t{time:.0f}ms.png')
+        draw.flow(Fx=Fx, Fy=Fy, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name='output/flow_final.png')  # consistent name
+        
         draw.flow(Fx=Fx1, Fy=Fy1, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field w/o COM at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name=f'output/flow1_t{time:.0f}ms.png')
+        draw.flow(Fx=Fx1, Fy=Fy1, X=X, Y=Y, color='blue', width=0.001, xlabel='x (μm)', ylabel='y (μm)', title=f'flow field w/o COM at t = {time:.2f}ms', fontsize=16, reduce_exponent=3, file_name='output/flow1_final.png')  # consistent name
     if args.mechanics: # output the time evolution of mechanical quantities
         print('\nsaving mechanical quantities ...')
         draw.quantity(time=time_list, quantity=Iz_tot_list, xlabel='time (ms)', ylabel='Iz_tot (kg*μm^2)', title='Moment of inertia around z', fontsize=16, file_name='output/Iz_tot.png')

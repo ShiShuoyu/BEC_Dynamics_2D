@@ -231,6 +231,12 @@ def get_result_images():
         'other': []
     }
     
+    # Separate final state images for easier access
+    categorized['density_final'] = [img for img in categorized['density'] if 'final' in img.lower()]
+    categorized['phase_final'] = [img for img in categorized['phase'] if 'final' in img.lower()]
+    categorized['flow_final'] = [img for img in categorized['flow'] if 'final' in img.lower()]
+    categorized['real_final'] = [img for img in categorized['real'] if 'final' in img.lower()]
+    
     # Add any uncategorized images to 'other'
     all_categorized = []
     for category in categorized.values():
