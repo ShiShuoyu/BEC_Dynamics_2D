@@ -1,0 +1,53 @@
+{
+  "atomic_parameters": {
+    "relative_atomic_mass": 87,
+    "scattering_length": -10.0,
+    "atom_number": 2500
+  },
+  "time_structure": {
+    "duration": 200.0,
+    "dt": 0.5,
+    "sampling_interval": 10
+  },
+  "grid_structure": {
+    "radius_xy": [
+      50,
+      50
+    ],
+    "number_xy": [
+      256,
+      256
+    ]
+  },
+  "potential_trap": {
+    "omega_trap": 0.031415926535897934,
+    "center_trap": [
+      0.0,
+      0.0
+    ],
+    "beta": -0.1,
+    "r_0": 30.0,
+    "omega_trap_z": 0.015707963267948967
+  },
+  "initial_wavepacket": {
+    "center_bec": [
+      30.0,
+      0.0
+    ],
+    "omega_bec": 0.031415926535897934,
+    "velocity": [
+      0.0,
+      0.9424777960769379
+    ],
+    "angular_momentum_bec": [
+      0,
+      0
+    ]
+  },
+  "simulation_settings": {
+    "imaginary_time": false,
+    "video": false,
+    "mechanics": false,
+    "figure": false
+  }
+}

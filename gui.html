@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEC Dynamics 2D - Simulation GUI</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .parameters-section {
+            padding: 20px;
+        }
+        
+        .results-section {
+            padding: 20px;
+            border-left: 1px solid #eee;
+        }
+        
+        @media (max-width: 900px) {
+            .results-section {
+                border-left: none;
+                border-top: 1px solid #eee;
+            }
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .parameter-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .group-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        .param-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .param-label {
+            min-width: 200px;
+            padding-right: 15px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .param-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .param-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        .checkbox-input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-radius: 8px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .status-text {
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .results-container {
+            margin-top: 20px;
+        }
+        
+        .image-viewer {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .image-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .img-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background-color: var(--success-color);
+        }
+        
+        .status-inactive {
+            background-color: #ccc;
+        }
+        
+        .log-container {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BEC Dynamics 2D</h1>
+            <div class="subtitle">Simulation Parameter Configuration and Control</div>
+        </header>
+        
+        <div class="main-content">
+            <div class="parameters-section">
+                <h2 class="section-title">Simulation Parameters</h2>
+                
+                <!-- Atomic Parameters -->
+                <div class="parameter-group">
+                    <h3 class="group-title">Atomic Parameters</h3>
+                    <div class="param-row">
+                        <label class="param-label">Relative Atomic Mass (amu):</label>
+                        <input type="number" id="relative_atomic_mass" class="param-input" value="87">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Scattering Length (a_Bohr):</label>
+                        <input type="number" id="scattering_length" class="param-input" value="-10.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Atom Number:</label>
+                        <input type="number" id="atom_number" class="param-input" value="2500">
+                    </div>
+                </div>
+                
+                <!-- Time Structure -->
+                <div class="parameter-group">
+                    <h3 class="group-title">Time Structure</h3>
+                    <div class="param-row">
+                        <label class="param-label">Duration (ms):</label>
+                        <input type="number" id="duration" class="param-input" value="200.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Time Step (ms):</label>
+                        <input type="number" id="dt" class="param-input" value="0.5" step="0.01">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Sampling Interval:</label>
+                        <input type="number" id="sampling_interval" class="param-input" value="10">
+                    </div>
+                </div>
+                
+                <!-- Grid Structure -->
+                <div class="parameter-group">
+                    <h3 class="group-title">Grid Structure</h3>
+                    <div class="param-row">
+                        <label class="param-label">Radius X (μm):</label>
+                        <input type="number" id="radius_x" class="param-input" value="50">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Radius Y (μm):</label>
+                        <input type="number" id="radius_y" class="param-input" value="50">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Number X:</label>
+                        <input type="number" id="number_x" class="param-input" value="256">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Number Y:</label>
+                        <input type="number" id="number_y" class="param-input" value="256">
+                    </div>
+                </div>
+                
+                <!-- Potential Trap -->
+                <div class="parameter-group">
+                    <h3 class="group-title">Potential Trap</h3>
+                    <div class="param-row">
+                        <label class="param-label">Trap Frequency ω (ms⁻¹):</label>
+                        <input type="number" id="omega_trap" class="param-input" value="0.031415926535897934">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Center X (μm):</label>
+                        <input type="number" id="center_trap_x" class="param-input" value="0.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Center Y (μm):</label>
+                        <input type="number" id="center_trap_y" class="param-input" value="0.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Anharmonic Parameter β:</label>
+                        <input type="number" id="beta" class="param-input" value="-0.1">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Length Scale r₀ (μm):</label>
+                        <input type="number" id="r_0" class="param-input" value="30.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Trap Frequency ω_z (ms⁻¹):</label>
+                        <input type="number" id="omega_trap_z" class="param-input" value="0.015707963267948967">
+                    </div>
+                </div>
+                
+                <!-- Initial Wavepacket -->
+                <div class="parameter-group">
+                    <h3 class="group-title">Initial Wavepacket</h3>
+                    <div class="param-row">
+                        <label class="param-label">BEC Center X (μm):</label>
+                        <input type="number" id="center_bec_x" class="param-input" value="30.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">BEC Center Y (μm):</label>
+                        <input type="number" id="center_bec_y" class="param-input" value="0.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">BEC Frequency ω_BEC (ms⁻¹):</label>
+                        <input type="number" id="omega_bec" class="param-input" value="0.031415926535897934">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Velocity X (μm/ms):</label>
+                        <input type="number" id="velocity_x" class="param-input" value="0.0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Velocity Y (μm/ms):</label>
+                        <input type="number" id="velocity_y" class="param-input" value="0.9424777960769379">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Angular Momentum l:</label>
+                        <input type="number" id="angular_momentum_l" class="param-input" value="0">
+                    </div>
+                    <div class="param-row">
+                        <label class="param-label">Angular Momentum m:</label>
+                        <input type="number" id="angular_momentum_m" class="param-input" value="0">
+                    </div>
+                </div>
+                
+                <!-- Simulation Settings -->
+                <div class="parameter-group">
+                    <h3 class="group-title">Simulation Settings</h3>
+                    <div class="param-row">
+                        <input type="checkbox" id="imaginary_time" class="checkbox-input">
+                        <label for="imaginary_time">Imaginary Time Evolution</label>
+                    </div>
+                    <div class="param-row">
+                        <input type="checkbox" id="video" class="checkbox-input">
+                        <label for="video">Save as Video</label>
+                    </div>
+                    <div class="param-row">
+                        <input type="checkbox" id="mechanics" class="checkbox-input">
+                        <label for="mechanics">Save Mechanical Quantities</label>
+                    </div>
+                    <div class="param-row">
+                        <input type="checkbox" id="figure" class="checkbox-input">
+                        <label for="figure">Save as Figure</label>
+                    </div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button id="saveDefaultsBtn" class="btn btn-warning">Save as Defaults</button>
+                    <button id="loadDefaultsBtn" class="btn btn-primary">Load Defaults</button>
+                    <button id="startSimulationBtn" class="btn btn-primary">Start Simulation</button>
+                </div>
+                
+                <div id="progressContainer" class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill">0%</div>
+                    </div>
+                    <div class="status-text" id="statusText">Initializing...</div>
+                </div>
+                
+                <div class="log-container" id="logContainer">
+                    <!-- Simulation logs will appear here -->
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title">Results Visualization</h2>
+                <div class="results-container">
+                    <p>Simulation results will be displayed here after completion.</p>
+                    
+                    <div class="image-controls">
+                        <button id="showDensityBtn" class="btn btn-primary">Show Density</button>
+                        <button id="showPhaseBtn" class="btn btn-primary">Show Phase</button>
+                        <button id="showFlowBtn" class="btn btn-primary">Show Flow Field</button>
+                    </div>
+                    
+                    <div class="image-viewer">
+                        <img id="resultImage" class="img-preview" src="placeholder.png" alt="Simulation Result Preview" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\" viewBox=\"0 0 400 300\"><rect width=\"400\" height=\"300\" fill=\"#f0f0f0\"/><text x=\"200\" y=\"150\" font-family=\"Arial\" font-size=\"16\" fill=\"#666\" text-anchor=\"middle\">Simulation results will appear here</text></svg>';">
+                    </div>
+                    
+                    <div id="imageControls" class="hidden">
+                        <h3>Image Controls</h3>
+                        <div class="param-row">
+                            <button id="zoomInBtn" class="btn btn-primary">Zoom In</button>
+                            <button id="zoomOutBtn" class="btn btn-primary">Zoom Out</button>
+                            <button id="resetZoomBtn" class="btn btn-warning">Reset Zoom</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default parameters loaded from the server
+        let defaults = {};
+        
+        // Load defaults from the server API
+        async function loadDefaults() {
+            try {
+                const response = await fetch('/api/defaults');
+                if (response.ok) {
+                    defaults = await response.json();
+                    populateFormWithDefaults();
+                    logMessage("Defaults loaded successfully from server");
+                } else {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+            } catch (error) {
+                logMessage("Error loading defaults from server: " + error.message);
+                // Use built-in defaults
+                defaults = {
+                    atomic_parameters: {
+                        relative_atomic_mass: 87,
+                        scattering_length: -10.0,
+                        atom_number: 2500
+                    },
+                    time_structure: {
+                        duration: 200.0,
+                        dt: 0.5,
+                        sampling_interval: 10
+                    },
+                    grid_structure: {
+                        radius_xy: [50, 50],
+                        number_xy: [256, 256]
+                    },
+                    potential_trap: {
+                        omega_trap: 0.031415926535897934,
+                        center_trap: [0.0, 0.0],
+                        beta: -0.1,
+                        r_0: 30.0,
+                        omega_trap_z: 0.015707963267948967
+                    },
+                    initial_wavepacket: {
+                        center_bec: [30.0, 0.0],
+                        omega_bec: 0.031415926535897934,
+                        velocity: [0.0, 0.9424777960769379],
+                        angular_momentum_bec: [0, 0]
+                    },
+                    simulation_settings: {
+                        imaginary_time: false,
+                        video: false,
+                        mechanics: false,
+                        figure: false
+                    }
+                };
+                populateFormWithDefaults();
+            }
+        }
+        
+        // Populate form fields with default values
+        function populateFormWithDefaults() {
+            if (Object.keys(defaults).length === 0) return;
+            
+            document.getElementById('relative_atomic_mass').value = defaults.atomic_parameters.relative_atomic_mass;
+            document.getElementById('scattering_length').value = defaults.atomic_parameters.scattering_length;
+            document.getElementById('atom_number').value = defaults.atomic_parameters.atom_number;
+            
+            document.getElementById('duration').value = defaults.time_structure.duration;
+            document.getElementById('dt').value = defaults.time_structure.dt;
+            document.getElementById('sampling_interval').value = defaults.time_structure.sampling_interval;
+            
+            document.getElementById('radius_x').value = defaults.grid_structure.radius_xy[0];
+            document.getElementById('radius_y').value = defaults.grid_structure.radius_xy[1];
+            document.getElementById('number_x').value = defaults.grid_structure.number_xy[0];
+            document.getElementById('number_y').value = defaults.grid_structure.number_xy[1];
+            
+            document.getElementById('omega_trap').value = defaults.potential_trap.omega_trap;
+            document.getElementById('center_trap_x').value = defaults.potential_trap.center_trap[0];
+            document.getElementById('center_trap_y').value = defaults.potential_trap.center_trap[1];
+            document.getElementById('beta').value = defaults.potential_trap.beta;
+            document.getElementById('r_0').value = defaults.potential_trap.r_0;
+            document.getElementById('omega_trap_z').value = defaults.potential_trap.omega_trap_z;
+            
+            document.getElementById('center_bec_x').value = defaults.initial_wavepacket.center_bec[0];
+            document.getElementById('center_bec_y').value = defaults.initial_wavepacket.center_bec[1];
+            document.getElementById('omega_bec').value = defaults.initial_wavepacket.omega_bec;
+            document.getElementById('velocity_x').value = defaults.initial_wavepacket.velocity[0];
+            document.getElementById('velocity_y').value = defaults.initial_wavepacket.velocity[1];
+            document.getElementById('angular_momentum_l').value = defaults.initial_wavepacket.angular_momentum_bec[0];
+            document.getElementById('angular_momentum_m').value = defaults.initial_wavepacket.angular_momentum_bec[1];
+            
+            document.getElementById('imaginary_time').checked = defaults.simulation_settings.imaginary_time;
+            document.getElementById('video').checked = defaults.simulation_settings.video;
+            document.getElementById('mechanics').checked = defaults.simulation_settings.mechanics;
+            document.getElementById('figure').checked = defaults.simulation_settings.figure;
+        }
+        
+        // Get current values from form
+        function getFormValues() {
+            return {
+                atomic_parameters: {
+                    relative_atomic_mass: parseInt(document.getElementById('relative_atomic_mass').value),
+                    scattering_length: parseFloat(document.getElementById('scattering_length').value),
+                    atom_number: parseInt(document.getElementById('atom_number').value)
+                },
+                time_structure: {
+                    duration: parseFloat(document.getElementById('duration').value),
+                    dt: parseFloat(document.getElementById('dt').value),
+                    sampling_interval: parseInt(document.getElementById('sampling_interval').value)
+                },
+                grid_structure: {
+                    radius_xy: [
+                        parseFloat(document.getElementById('radius_x').value),
+                        parseFloat(document.getElementById('radius_y').value)
+                    ],
+                    number_xy: [
+                        parseInt(document.getElementById('number_x').value),
+                        parseInt(document.getElementById('number_y').value)
+                    ]
+                },
+                potential_trap: {
+                    omega_trap: parseFloat(document.getElementById('omega_trap').value),
+                    center_trap: [
+                        parseFloat(document.getElementById('center_trap_x').value),
+                        parseFloat(document.getElementById('center_trap_y').value)
+                    ],
+                    beta: parseFloat(document.getElementById('beta').value),
+                    r_0: parseFloat(document.getElementById('r_0').value),
+                    omega_trap_z: parseFloat(document.getElementById('omega_trap_z').value)
+                },
+                initial_wavepacket: {
+                    center_bec: [
+                        parseFloat(document.getElementById('center_bec_x').value),
+                        parseFloat(document.getElementById('center_bec_y').value)
+                    ],
+                    omega_bec: parseFloat(document.getElementById('omega_bec').value),
+                    velocity: [
+                        parseFloat(document.getElementById('velocity_x').value),
+                        parseFloat(document.getElementById('velocity_y').value)
+                    ],
+                    angular_momentum_bec: [
+                        parseInt(document.getElementById('angular_momentum_l').value),
+                        parseInt(document.getElementById('angular_momentum_m').value)
+                    ]
+                },
+                simulation_settings: {
+                    imaginary_time: document.getElementById('imaginary_time').checked,
+                    video: document.getElementById('video').checked,
+                    mechanics: document.getElementById('mechanics').checked,
+                    figure: document.getElementById('figure').checked
+                }
+            };
+        }
+        
+        // Save current values as defaults
+        async function saveAsDefaults() {
+            const currentValues = getFormValues();
+            
+            try {
+                const response = await fetch('/api/defaults', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentValues)
+                });
+                
+                if (response.ok) {
+                    logMessage("Defaults saved successfully on server");
+                } else {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+            } catch (error) {
+                logMessage("Error saving defaults: " + error.message);
+            }
+        }
+        
+        // Update progress bar
+        function updateProgress(percent, message) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressFill').textContent = Math.round(percent) + '%';
+            document.getElementById('statusText').textContent = message;
+        }
+        
+        // Show progress container
+        function showProgress() {
+            document.getElementById('progressContainer').style.display = 'block';
+        }
+        
+        // Hide progress container
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+        
+        // Log message to the console area
+        function logMessage(message) {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Run the simulation via the server
+        async function runSimulation() {
+            logMessage("Starting simulation via server...");
+            
+            // Get form values
+            const params = getFormValues();
+            logMessage("Sending parameters to server...");
+            
+            try {
+                const response = await fetch('/api/simulation/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params)
+                });
+                
+                if (response.ok) {
+                    logMessage("Simulation started on server");
+                    showProgress();
+                    updateProgress(0, "Simulation started...");
+                    
+                    // Poll for status updates
+                    const statusInterval = setInterval(async () => {
+                        try {
+                            const statusResponse = await fetch('/api/simulation/status');
+                            if (statusResponse.ok) {
+                                const statusData = await statusResponse.json();
+                                
+                                // Update progress bar
+                                updateProgress(statusData.progress, statusData.status);
+                                
+                                // Update log with new messages
+                                statusData.log.forEach(logEntry => {
+                                    logMessage(logEntry);
+                                });
+                                
+                                // If simulation is complete, stop polling
+                                if (!statusData.running && statusData.status.includes("Completed")) {
+                                    clearInterval(statusInterval);
+                                    hideProgress();
+                                    logMessage("Simulation completed! Loading results...");
+                                    
+                                    // Load available result images
+                                    loadResultImages();
+                                } else if (!statusData.running && statusData.status.includes("Error")) {
+                                    clearInterval(statusInterval);
+                                    hideProgress();
+                                    logMessage("Simulation encountered an error");
+                                }
+                            } else {
+                                logMessage("Error getting simulation status from server");
+                            }
+                        } catch (error) {
+                            logMessage("Error polling simulation status: " + error.message);
+                        }
+                    }, 1000); // Update every second
+                } else {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+            } catch (error) {
+                logMessage("Error starting simulation: " + error.message);
+            }
+        }
+        
+        // Load result images from the server
+        async function loadResultImages() {
+            try {
+                const response = await fetch('/api/results/images');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.images.length > 0) {
+                        // Show the first density image as a preview, or any image if no density images exist
+                        let imgToLoad = null;
+                        if (data.categorized.density.length > 0) {
+                            imgToLoad = data.categorized.density[0];
+                        } else if (data.images.length > 0) {
+                            imgToLoad = data.images[0];
+                        }
+                        
+                        if (imgToLoad) {
+                            document.getElementById('resultImage').src = `/results/${imgToLoad}`;
+                            document.getElementById('imageControls').classList.remove('hidden');
+                            logMessage(`Loaded ${data.images.length} result images. Showing: ${imgToLoad}`);
+                        } else {
+                            logMessage("No images available to display");
+                        }
+                    } else {
+                        logMessage("No result images found in output directory");
+                    }
+                } else {
+                    logMessage("Error loading result images: Server responded with status " + response.status);
+                }
+            } catch (error) {
+                logMessage("Error loading result images: " + error.message);
+            }
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load defaults when page loads
+            loadDefaults();
+            
+            // Button event listeners
+            document.getElementById('saveDefaultsBtn').addEventListener('click', function() {
+                saveAsDefaults();
+            });
+            
+            document.getElementById('loadDefaultsBtn').addEventListener('click', function() {
+                loadDefaults();
+                logMessage("Defaults reloaded from server");
+            });
+            
+            document.getElementById('startSimulationBtn').addEventListener('click', function() {
+                runSimulation();
+            });
+            
+            // Image display buttons
+            document.getElementById('showDensityBtn').addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/results/images');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.categorized.density.length > 0) {
+                            document.getElementById('resultImage').src = `/results/${data.categorized.density[0]}`;
+                            logMessage(`Displaying density plot: ${data.categorized.density[0]}`);
+                        } else {
+                            logMessage("No density images found");
+                        }
+                    }
+                } catch (error) {
+                    logMessage("Error loading density image: " + error.message);
+                }
+            });
+            
+            document.getElementById('showPhaseBtn').addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/results/images');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.categorized.phase.length > 0) {
+                            document.getElementById('resultImage').src = `/results/${data.categorized.phase[0]}`;
+                            logMessage(`Displaying phase plot: ${data.categorized.phase[0]}`);
+                        } else {
+                            logMessage("No phase images found");
+                        }
+                    }
+                } catch (error) {
+                    logMessage("Error loading phase image: " + error.message);
+                }
+            });
+            
+            document.getElementById('showFlowBtn').addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/results/images');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.categorized.flow.length > 0) {
+                            document.getElementById('resultImage').src = `/results/${data.categorized.flow[0]}`;
+                            logMessage(`Displaying flow field plot: ${data.categorized.flow[0]}`);
+                        } else if (data.categorized.real.length > 0) {
+                            // If no flow images, show real component as alternative
+                            document.getElementById('resultImage').src = `/results/${data.categorized.real[0]}`;
+                            logMessage(`Displaying real component plot: ${data.categorized.real[0]}`);
+                        } else {
+                            logMessage("No flow field or real component images found");
+                        }
+                    }
+                } catch (error) {
+                    logMessage("Error loading flow image: " + error.message);
+                }
+            });
+            
+            // Image controls
+            document.getElementById('zoomInBtn').addEventListener('click', function() {
+                const img = document.getElementById('resultImage');
+                const currentScale = parseFloat(img.style.transform.split('scale(')[1]) || 1;
+                img.style.transform = `scale(${currentScale * 1.1})`;
+                logMessage("Zoomed in");
+            });
+            
+            document.getElementById('zoomOutBtn').addEventListener('click', function() {
+                const img = document.getElementById('resultImage');
+                const currentScale = parseFloat(img.style.transform.split('scale(')[1]) || 1;
+                img.style.transform = `scale(${Math.max(0.1, currentScale * 0.9)})`;
+                logMessage("Zoomed out");
+            });
+            
+            document.getElementById('resetZoomBtn').addEventListener('click', function() {
+                document.getElementById('resultImage').style.transform = 'scale(1)';
+                logMessage("Zoom reset");
+            });
+        });
+    </script>
+</body>
+</html>
